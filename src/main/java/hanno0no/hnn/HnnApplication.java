@@ -9,5 +9,4 @@ public class HnnApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HnnApplication.class, args);
 	}
-
 }
