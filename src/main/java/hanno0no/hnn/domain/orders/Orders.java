@@ -32,7 +32,7 @@ public class Orders {
 
     @ManyToOne
     @JoinColumn(name = "state_num")
-    private State state;
+    private State stateId;
 
     @ManyToOne
     @JoinColumn(name = "admin_id")
@@ -76,11 +76,11 @@ public class Orders {
         this.material = material;
     }
 
-    public State getState() {
-        return state;
+    public State getStateId() {
+        return stateId;
     }
-    public void setState(State state) {
-        this.state = state;
+    public void setStateId(State stateId) {
+        this.stateId = stateId;
     }
 
     public AdminUser getAdmin() {
