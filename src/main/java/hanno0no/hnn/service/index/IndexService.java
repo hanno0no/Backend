@@ -1,6 +1,9 @@
 package hanno0no.hnn.service.index;
 
 
+import hanno0no.hnn.domain.message.Message;
+import hanno0no.hnn.domain.orders.Orders;
+import hanno0no.hnn.domain.team.Team;
 import hanno0no.hnn.repository.eventinfo.EventInofoRepository;
 import hanno0no.hnn.repository.message.MessageRepository;
 import hanno0no.hnn.repository.orders.OrdersRepository;
@@ -8,6 +11,12 @@ import hanno0no.hnn.repository.state.StateRepository;
 import hanno0no.hnn.response.index.IndexStatusResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,13 +34,43 @@ public class IndexService {
     private final OrdersRepository ordersRepository;
     private final EventInofoRepository eventInofoRepository;
     private final MessageRepository messageRepository;
+    private final StateRepository stateRepository;
 
 
     public IndexStatusResponse getIndexInfo() {
+        Integer completeStateId = stateRepository.findStateIdByState("print");      // 프린트 완료 = 최종 완료
+        Integer rejectionStateId = stateRepository.findStateIdByState("rejection");
+        List<Orders> completeTeams = ordersRepository.findOrdersByStateId(completeStateId);
+
+        List<String> completeTeamNum = completeTeams.stream().map(order -> order.getTeam().getTeamNum()).collect(Collectors.toList());
+        Collections.reverse(completeTeamNum);
+
+        List<Integer> excludedStateIds = Arrays.asList(completeStateId, rejectionStateId);
+        List<Orders> ongoingTeams = ordersRepository.findByStateIdNotIn(excludedStateIds);
+
+        List<String> ongoingTeamNum = ongoingTeams.stream().map(order -> order.getTeam().getTeamNum()).collect(Collectors.toList());
+        Collections.reverse(ongoingTeamNum);
 
 
 
-        return null;
+        Integer enventId = eventInofoRepository.findEventInfoByEventName("SW해커톤");
+        LocalDateTime endTime = eventInofoRepository.findEndTimeByEventId(enventId);
+
+        List<Message> emergencyMessage = messageRepository.findAllByEmergency();
+
+        List<String> emergencyMessageContent = emergencyMessage.stream().map(message -> message.getContent()).collect(Collectors.toList());
+        Collections.reverse(emergencyMessageContent);
+
+        List<Message> generalMessage = messageRepository.findAllByNonEmergency();
+        List<String> generalMessageContent = generalMessage.stream().map(message -> message.getContent()).collect(Collectors.toList());
+        Collections.reverse(generalMessageContent);
+
+
+        return new IndexStatusResponse(
+                completeTeamNum, ongoingTeamNum, endTime, emergencyMessageContent, generalMessageContent
+        );
+
+
     }
 
 

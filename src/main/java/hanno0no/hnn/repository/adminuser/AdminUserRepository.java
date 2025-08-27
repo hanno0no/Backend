@@ -9,9 +9,9 @@ import java.util.Optional;
 
 @Repository
 public interface AdminUserRepository extends JpaRepository<AdminUser, Integer> {
-    Optional<AdminUser> findByUsername(String username);        // username으로 사용자 조회
+    Optional<AdminUser> findByUserName(String username);        // username으로 사용자 조회
 
-    boolean existsByUsername(String username);      // username 존재 여부 확인
+    boolean existsByUserName(String username);      // username 존재 여부 확인
 
     List<AdminUser> findByRole(String role);        // 특정 역할을 가진 관리자 리스트
 

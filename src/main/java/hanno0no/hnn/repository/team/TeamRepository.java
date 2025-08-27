@@ -1,5 +1,6 @@
 package hanno0no.hnn.repository.team;
 
+import hanno0no.hnn.domain.team.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,12 +9,12 @@ import java.util.Optional;
 
 
 @Repository
-public interface TeamRepository extends JpaRepository<TeamRepository, String> {
+public interface TeamRepository extends JpaRepository<Team, String> {
 
-    Optional<TeamRepository> findByTeamNum(String teamNum);
+    Optional<Team> findByTeamNum(String teamNum);
 
     boolean existsByTeamNum(String teamNum);
 
-    List<TeamRepository> findAll();
+    List<Team> findAll();
 }
 
