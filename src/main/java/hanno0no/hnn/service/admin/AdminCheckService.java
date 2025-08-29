@@ -79,7 +79,7 @@ public class AdminCheckService {
             String fileName = order.getFileName();
             String teamNum = order.getTeam().getTeamNum();
             String material = order.getMaterial().getMaterialName();
-            String state = order.getStateId().getState();
+            String state = order.getState().getState();
             String managerName = "";
 
             AdminUser admin = order.getAdmin();

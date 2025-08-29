@@ -54,7 +54,7 @@ public class CheckStatusService {
             int orderId = order.getOrderId();
             String teamNumStr = order.getTeam().getTeamNum();
             String material = order.getMaterial().getMaterialName();
-            String status = order.getStateId().getState();
+            String status = order.getState().getState();
             LocalDateTime orderTime = order.getOrderedAt();
 
             responses.add(new CheckStatusResponse(orderId, teamNumStr, material, status, orderTime));

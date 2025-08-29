@@ -5,11 +5,15 @@ import hanno0no.hnn.domain.material.Material;
 import hanno0no.hnn.domain.state.State;
 import hanno0no.hnn.domain.team.Team;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "orders")
+@Getter
+@Setter
 public class Orders {
 
     @Id
@@ -38,59 +42,6 @@ public class Orders {
     @ManyToOne
     @JoinColumn(name = "admin_id")
     private AdminUser admin;
-
-
-    public Orders() {}
-
-    public Integer getOrderId() {
-        return orderId;
-    }
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public LocalDateTime getOrderedAt() {
-        return orderedAt;
-    }
-    public void setOrderedAt(LocalDateTime orderedAt) {
-        this.orderedAt = orderedAt;
-    }
-
-    public Team getTeam() {
-        return team;
-    }
-    public void setTeam(Team team) {
-        this.team = team;
-    }
-
-    public Material getMaterial() {
-        return material;
-    }
-    public void setMaterial(Material material) {
-        this.material = material;
-    }
-
-    public State getStateId() {
-        return state;
-    }
-    public void setState(State stateId) {
-        this.state = stateId;
-    }
-
-    public AdminUser getAdmin() {
-        return admin;
-    }
-    public void setAdmin(AdminUser admin) {
-        this.admin = admin;
-    }
-
 
 
 }
