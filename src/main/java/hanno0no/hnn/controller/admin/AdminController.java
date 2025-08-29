@@ -3,6 +3,7 @@ package hanno0no.hnn.controller.admin;
 
 import hanno0no.hnn.request.admin.AdminCreateRequest;
 import hanno0no.hnn.request.admin.AdminLoginRequest;
+import hanno0no.hnn.request.admin.OrderSearchRequest;
 import hanno0no.hnn.response.admin.AdminCheckResponse;
 import hanno0no.hnn.response.admin.AdminLoginResponse;
 import hanno0no.hnn.service.admin.AdminCheckService;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -41,10 +43,10 @@ public class AdminController {
     }
 
     @GetMapping("/view")
-    public ResponseEntity<List<AdminCheckResponse>> getAllOrders() {
-//        System.out.println("1test");
-        List<AdminCheckResponse> responses = adminCheckService.getAllOrder();
-//        System.out.println("2test");
+    public ResponseEntity<List<AdminCheckResponse>> getOrders(OrderSearchRequest orderSearchRequest) {
+
+        List<AdminCheckResponse> responses = adminCheckService.getOrders(orderSearchRequest);
+
         return ResponseEntity.ok(responses);
     }
 

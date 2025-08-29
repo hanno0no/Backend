@@ -8,15 +8,18 @@ import hanno0no.hnn.repository.material.MaterialRepository;
 import hanno0no.hnn.repository.orders.OrdersRepository;
 import hanno0no.hnn.repository.state.StateRepository;
 import hanno0no.hnn.request.admin.AdminLoginRequest;
+import hanno0no.hnn.request.admin.OrderSearchRequest;
 import hanno0no.hnn.response.admin.AdminCheckResponse;
 import hanno0no.hnn.response.admin.AdminLoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +41,32 @@ public class AdminCheckService {
     private final AdminUserRepository adminUserRepository;
 
 
-    public List<AdminCheckResponse> getAllOrder() {
+    public List<AdminCheckResponse> getOrders(OrderSearchRequest orderSearchRequest) {
 
-        List<Orders> orders = ordersRepository.findAll();
+        List<Orders> orders = new ArrayList<>();
+
+        String status = orderSearchRequest.getStatus();
+        String manager = orderSearchRequest.getManager();
+
+        if (StringUtils.hasText(status) && StringUtils.hasText(manager)) {
+            int intStateId = stateRepository.findStateIdByState(orderSearchRequest.getStatus())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상태(status) 이름입니다: " + orderSearchRequest.getStatus()));
+
+            orders = ordersRepository.findByAdminAndStateId(orderSearchRequest.getManager() ,intStateId);
+        }
+        else if (StringUtils.hasText(status)) {
+            int intStateId = stateRepository.findStateIdByState(orderSearchRequest.getStatus())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상태(status) 이름입니다: " + orderSearchRequest.getStatus()));
+
+            orders = ordersRepository.findOrdersByStateId(intStateId);
+        }
+        else if (StringUtils.hasText(manager)) {
+            orders = ordersRepository.findByAdmin(orderSearchRequest.getManager());
+        }
+        else {
+            orders = ordersRepository.findAll();
+        }
+
 
         if (orders.isEmpty()) {
             return new ArrayList<>();
