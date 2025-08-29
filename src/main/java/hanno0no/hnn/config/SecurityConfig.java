@@ -1,5 +1,6 @@
 package hanno0no.hnn.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,10 +9,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -22,19 +27,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF 보호 비활성화 (JWT 사용 시 불필요)
                 .csrf(csrf -> csrf.disable())
-
-                // 세션을 사용하지 않도록 설정 (Stateless)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                // HTTP 요청에 대한 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        // '/api/v1/admin/login' 경로는 누구나 접근 허용
-                        .requestMatchers("/api/v1/admin/login").permitAll()
-                        // 그 외의 모든 요청은 일단 허용 (나중에 JWT 필터로 개별 검증)
-                        .anyRequest().permitAll()
-                );
+                        // '/api/v1/admin/login' 과 '/api/v1/admins/signup'은 누구나 접근 가능
+                        .requestMatchers(
+                                "/hnn/admin/login",
+                                "/hnn/admins/signup",
+                                "hnn/index",
+                                "hnn/checkStatus",
+                                "hnn/checkStatus/view",
+                                "hnn/registar"
+                        ).permitAll()
+
+                        // '/hnn/admin/**' 경로는 'ADMIN' 역할을 가진 사용자만 접근 가능
+                        .requestMatchers("/hnn/admin/**").hasRole("admin")
+
+                        // 그 외의 다른 모든 요청은 일단 인증만 되면 접근 가능하도록 설정 (필요에 따라 수정)
+                        .anyRequest().authenticated()
+                )
+                // ✨ Spring Security의 기본 필터 앞에 우리가 만든 JWT 필터를 추가
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }
