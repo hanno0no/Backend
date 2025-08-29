@@ -14,7 +14,7 @@ public class AdminUser {
     @Column(name = "username")
     private String userName;
 
-    private String password;
+    private String password_hash;
     private String role;
 
     public AdminUser() {}  // 기본 생성자
@@ -33,11 +33,11 @@ public class AdminUser {
         this.userName = userName;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPassword_hash() {
+        return password_hash;
     }
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword_hash(String password_hash) {
+        this.password_hash = password_hash;
     }
 
     public String getRole() {
