@@ -4,7 +4,7 @@ package hanno0no.hnn.service.index;
 import hanno0no.hnn.domain.eventinfo.EventInfo;
 import hanno0no.hnn.domain.message.Message;
 import hanno0no.hnn.domain.orders.Orders;
-import hanno0no.hnn.repository.eventinfo.EventInofoRepository;
+import hanno0no.hnn.repository.eventinfo.EventInfoRepository;
 import hanno0no.hnn.repository.message.MessageRepository;
 import hanno0no.hnn.repository.orders.OrdersRepository;
 import hanno0no.hnn.repository.state.StateRepository;
@@ -34,7 +34,7 @@ public class IndexService {
      */
 
     private final OrdersRepository ordersRepository;
-    private final EventInofoRepository eventInfoRepository;
+    private final EventInfoRepository eventInfoRepository;
     private final MessageRepository messageRepository;
     private final StateRepository stateRepository;
 

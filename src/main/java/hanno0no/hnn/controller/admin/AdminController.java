@@ -4,10 +4,8 @@ package hanno0no.hnn.controller.admin;
 import hanno0no.hnn.request.admin.*;
 import hanno0no.hnn.response.admin.AdminCheckResponse;
 import hanno0no.hnn.response.admin.AdminLoginResponse;
-import hanno0no.hnn.service.admin.AdminCheckService;
-import hanno0no.hnn.service.admin.AdminCreateService;
-import hanno0no.hnn.service.admin.AdminLoginService;
-import hanno0no.hnn.service.admin.AdminUpdateService;
+import hanno0no.hnn.response.admin.AdminSettingResponse;
+import hanno0no.hnn.service.admin.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +24,7 @@ public class AdminController {
     private final AdminCreateService adminCreateService;
     private final AdminCheckService adminCheckService;
     private final AdminUpdateService adminUpdateService;
+    private final AdminSettingService adminSettingService;
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request) {
@@ -67,6 +66,12 @@ public class AdminController {
         adminUpdateService.updateOrderManager(orderId, request.getManager());
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/setting")
+    public ResponseEntity setting() {
+
+        return ResponseEntity.ok(adminSettingService.getAdminSetting());
     }
 
 }

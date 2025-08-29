@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EventInofoRepository extends JpaRepository<EventInfo, Integer> {
+public interface EventInfoRepository extends JpaRepository<EventInfo, Integer> {
 
     List<EventInfo> findAll();          // 모든 행사들 리스트로 반환
 
@@ -20,5 +20,10 @@ public interface EventInofoRepository extends JpaRepository<EventInfo, Integer> 
     @Query("SELECT e.endTime FROM EventInfo e WHERE e.eventId = :eventId")
     Optional<LocalDateTime> findEndTimeByEventId(@Param("eventId") Integer eventId);        // 행사가 끝나는 시간 로딩
 
+    @Query("SELECT e from EventInfo e where e.isOpen = true ")
+    Optional<EventInfo> findByIsOpen();
+
+    @Query("SELECT e from EventInfo e where e.isOpen = false ")
+    List<EventInfo> findAllByIsNotOpen();
 
 }
