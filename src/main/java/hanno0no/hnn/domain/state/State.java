@@ -13,6 +13,7 @@ public class State {
     @Column(name="state_num")
     private int stateId;
 
+    @Column(name="state")
     private String state;
 
     public State() {}
