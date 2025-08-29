@@ -3,12 +3,17 @@ package hanno0no.hnn.controller.admin;
 
 import hanno0no.hnn.request.admin.AdminCreateRequest;
 import hanno0no.hnn.request.admin.AdminLoginRequest;
+import hanno0no.hnn.response.admin.AdminCheckResponse;
 import hanno0no.hnn.response.admin.AdminLoginResponse;
+import hanno0no.hnn.service.admin.AdminCheckService;
 import hanno0no.hnn.service.admin.AdminCreateService;
 import hanno0no.hnn.service.admin.AdminLoginService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -18,6 +23,7 @@ public class AdminController {
 
     private final AdminLoginService adminLoginService;
     private final AdminCreateService adminCreateService;
+    private final AdminCheckService adminCheckService;
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request) {
@@ -32,6 +38,12 @@ public class AdminController {
 
         return ResponseEntity.ok("관리자 계정이 성공적으로 생성되었습니다. ID: " + newAdminId);
 
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<List<AdminCheckResponse>> getAllOrders() {
+        List<AdminCheckResponse> responses = adminCheckService.getAllOrder();
+        return ResponseEntity.ok(responses);
     }
 
 }
