@@ -1,5 +1,9 @@
 package hanno0no.hnn.response.admin;
 
+
+import lombok.Getter;
+
+@Getter
 public class AdminCheckResponse {
 
     private final int orderId;

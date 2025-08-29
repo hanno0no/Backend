@@ -1,6 +1,7 @@
 package hanno0no.hnn.domain.adminuser;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Entity
+@Getter
 @Table(name = "admin_user")
 public class AdminUser implements UserDetails {
 

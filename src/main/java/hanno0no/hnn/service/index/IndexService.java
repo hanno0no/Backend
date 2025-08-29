@@ -79,10 +79,18 @@ public class IndexService {
         List<String> generalMessageContent = generalMessage.stream().map(message -> message.getContent()).collect(Collectors.toList());
         Collections.reverse(generalMessageContent);
 
-
-        return new IndexStatusResponse(
+        IndexStatusResponse response = new IndexStatusResponse(
                 completeTeamNum, ongoingTeamNum, endTime, emergencyMessageContent, generalMessageContent
         );
+
+//        System.out.println("===== 서비스에서 반환 직전 데이터 확인 =====");
+//        System.out.println("완료된 팀 개수: " + response.getCompletedTeam().size());
+//        System.out.println("진행중인 팀 개수: " + response.getWaitingTeam().size());
+//        System.out.println("======================================");
+
+
+
+        return response;
 
 
     }

@@ -17,7 +17,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/hnn")
+@RequestMapping("/hnn/admin")
 @RequiredArgsConstructor
 public class AdminController {
 
@@ -40,9 +40,11 @@ public class AdminController {
 
     }
 
-    @GetMapping("/admin")
+    @GetMapping("/view")
     public ResponseEntity<List<AdminCheckResponse>> getAllOrders() {
+//        System.out.println("1test");
         List<AdminCheckResponse> responses = adminCheckService.getAllOrder();
+//        System.out.println("2test");
         return ResponseEntity.ok(responses);
     }
 

@@ -1,6 +1,7 @@
 package hanno0no.hnn.service.admin;
 
 
+import hanno0no.hnn.domain.adminuser.AdminUser;
 import hanno0no.hnn.domain.orders.Orders;
 import hanno0no.hnn.repository.adminuser.AdminUserRepository;
 import hanno0no.hnn.repository.material.MaterialRepository;
@@ -10,6 +11,7 @@ import hanno0no.hnn.request.admin.AdminLoginRequest;
 import hanno0no.hnn.response.admin.AdminCheckResponse;
 import hanno0no.hnn.response.admin.AdminLoginResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +54,13 @@ public class AdminCheckService {
             String teamNum = order.getTeam().getTeamNum();
             String material = order.getMaterial().getMaterialName();
             String state = order.getStateId().getState();
-            String managerName = order.getAdmin().getUserName();
+            String managerName = "";
+
+            AdminUser admin = order.getAdmin();
+            if (admin != null) {
+                managerName = admin.getUserName();
+            }
+
 
             responses.add(new AdminCheckResponse(orderId, fileName, teamNum, material, state, managerName));
 

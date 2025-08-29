@@ -1,8 +1,12 @@
 package hanno0no.hnn.response.index;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+
+@Getter
 public class IndexStatusResponse {
 
     private List<String> completedTeam;

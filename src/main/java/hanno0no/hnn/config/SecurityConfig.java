@@ -31,10 +31,17 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // '/api/v1/admin/login' 과 '/api/v1/admins/signup'은 누구나 접근 가능
-                        .requestMatchers("/api/v1/admin/login", "/api/v1/admins/signup").permitAll()
+                        .requestMatchers(
+                                "/hnn/admin/login",
+                                "/hnn/admins/signup",
+                                "hnn/index",
+                                "hnn/checkStatus",
+                                "hnn/checkStatus/view",
+                                "hnn/registar"
+                        ).permitAll()
 
                         // '/hnn/admin/**' 경로는 'ADMIN' 역할을 가진 사용자만 접근 가능
-                        .requestMatchers("/hnn/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/hnn/admin/**").hasRole("admin")
 
                         // 그 외의 다른 모든 요청은 일단 인증만 되면 접근 가능하도록 설정 (필요에 따라 수정)
                         .anyRequest().authenticated()
