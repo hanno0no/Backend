@@ -1,7 +1,9 @@
 package hanno0no.hnn.repository.orders;
 
 
+import hanno0no.hnn.domain.adminuser.AdminUser;
 import hanno0no.hnn.domain.orders.Orders;
+import hanno0no.hnn.domain.state.State;
 import hanno0no.hnn.domain.team.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,6 +27,12 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
     @Query("SELECT o FROM Orders o WHERE o.team.teamNum = :team")
     List<Orders> findByTeam(@Param("team") String team);         // team에 대한 모든 주문건 조회
 
+
+    @Query("SELECT o FROM Orders o WHERE o.admin.userName = :username")
+    List<Orders> findByAdmin(@Param("username") String username);
+
+    @Query("select o from Orders o where o.admin.userName = :username and o.state.stateId = :stateId")
+    List<Orders> findByAdminAndStateId(@Param("username") String username, @Param("stateId") Integer stateId);
 
 
 }
