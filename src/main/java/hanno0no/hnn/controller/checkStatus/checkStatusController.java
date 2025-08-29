@@ -1,4 +1,4 @@
-package hanno0no.hnn.controller.CheckStatus;
+package hanno0no.hnn.controller.checkStatus;
 
 
 import hanno0no.hnn.response.checkStatus.CheckStatusResponse;
