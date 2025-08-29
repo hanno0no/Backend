@@ -14,12 +14,13 @@ public class Orders {
 
     @Id
     @Column(name = "order_id")
-    private int orderId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer orderId;
 
     @Column(name = "file_name")
     private String fileName;
 
-    @Column(name = "ordered_at")
+    @Column(name = "ordered_at", insertable = false, updatable = false)
     private LocalDateTime orderedAt;
 
     @ManyToOne
@@ -41,7 +42,7 @@ public class Orders {
 
     public Orders() {}
 
-    public int getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
     public void setOrderId(int orderId) {
@@ -79,7 +80,7 @@ public class Orders {
     public State getStateId() {
         return state;
     }
-    public void setStateId(State stateId) {
+    public void setState(State stateId) {
         this.state = stateId;
     }
 

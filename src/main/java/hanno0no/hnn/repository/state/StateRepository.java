@@ -1,5 +1,6 @@
 package hanno0no.hnn.repository.state;
 
+import hanno0no.hnn.domain.material.Material;
 import hanno0no.hnn.domain.state.State;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,5 +22,5 @@ public interface StateRepository extends JpaRepository<State, Integer> {
     @Query("SELECT s.state from  State s WHERE s.stateId = :stateId")
     Optional<State> findStateById(@Param("stateId") Integer stateId);
 
-
+    Optional<State> findByState(String State);
 }
