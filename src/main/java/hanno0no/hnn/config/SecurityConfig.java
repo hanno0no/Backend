@@ -37,7 +37,10 @@ public class SecurityConfig {
                                 "hnn/index",
                                 "hnn/checkStatus",
                                 "hnn/checkStatus/view",
-                                "hnn/registar"
+                                "hnn/registar",
+                                "hnn/registar/getmaterial",
+                                "hnn/registar/getstate",
+                                "hnn/registar/getadminname"
                         ).permitAll()
 
                         // '/hnn/admin/**' 경로는 'ADMIN' 역할을 가진 사용자만 접근 가능

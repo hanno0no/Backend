@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 @Controller
 @RequestMapping("/hnn/checkStatus")
 @RequiredArgsConstructor
