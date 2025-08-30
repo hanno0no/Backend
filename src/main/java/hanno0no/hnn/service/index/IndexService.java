@@ -40,34 +40,41 @@ public class IndexService {
 
 
     public IndexStatusResponse getIndexInfo() {
-        Optional<Integer> completeStateIdOptional = stateRepository.findStateIdByState("print");      // 프린트 완료 = 최종 완료
-        Optional<Integer> rejectionStateIdOptional = stateRepository.findStateIdByState("rejection");
 
-        Integer completeStateId = completeStateIdOptional
+        Integer completeStateId = stateRepository.findStateIdByState("print")   // 프린트 완료 = 최종 완료
                 .orElseThrow(() -> new EntityNotFoundException("'print' 상태의 ID를 찾을 수 없습니다."));
-        Integer rejectionStateId = rejectionStateIdOptional
+        Integer rejectionStateId = stateRepository.findStateIdByState("rejection")
                 .orElseThrow(() -> new EntityNotFoundException("'rejection' 상태의 ID를 찾을 수 없습니다."));
 
         List<Orders> completeTeams = ordersRepository.findOrdersByStateId(completeStateId);
 
-        List<String> completeTeamNum = completeTeams.stream().map(order -> order.getTeam().getTeamNum()).collect(Collectors.toList());
+//        List<String> completeTeamNum = completeTeams.stream().map(order -> order.getTeam().getTeamNum()).collect(Collectors.toList());
+//        Collections.reverse(completeTeamNum);
+
+        List<String> completeTeamNum = completeTeams.stream()
+                .map(order -> order.getTeam().getTeamNum() + "_" + order.getOrderId())
+                .collect(Collectors.toList());
         Collections.reverse(completeTeamNum);
+
 
         List<Integer> excludedStateIds = Arrays.asList(completeStateId, rejectionStateId);
         List<Orders> ongoingTeams = ordersRepository.findByState_StateIdNotIn(excludedStateIds);
 
-        List<String> ongoingTeamNum = ongoingTeams.stream().map(order -> order.getTeam().getTeamNum()).collect(Collectors.toList());
+//        List<String> ongoingTeamNum = ongoingTeams.stream().map(order -> order.getTeam().getTeamNum()).collect(Collectors.toList());
+//        Collections.reverse(ongoingTeamNum);
+
+        List<String> ongoingTeamNum = ongoingTeams.stream()
+                .map(order -> order.getTeam().getTeamNum() + "_" + order.getOrderId())
+                .collect(Collectors.toList());
         Collections.reverse(ongoingTeamNum);
 
 
-        Optional<EventInfo> eventInfoOptional = eventInfoRepository.findEventInfoByEventName("SW해커톤");
-        EventInfo eventInfo = eventInfoOptional
-                .orElseThrow(() -> new EntityNotFoundException("해당 이벤트를 찾을 수 없습니다."));
-        Integer eventId = eventInfo.getEventId();
+        EventInfo activeEvent = eventInfoRepository.findByIsOpen()
+                .orElseThrow(() -> new EntityNotFoundException("현재 진행중인 이벤트가 없습니다."));
+        Integer eventId = activeEvent.getEventId();
 
 
-        Optional<LocalDateTime> endTimeOptional = eventInfoRepository.findEndTimeByEventId(eventId);
-        LocalDateTime endTime = endTimeOptional
+        LocalDateTime endTime = eventInfoRepository.findEndTimeByEventId(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 이벤트를 찾을 수 없습니다."));
 
         List<Message> emergencyMessage = messageRepository.findAllByEmergency();
@@ -82,12 +89,6 @@ public class IndexService {
         IndexStatusResponse response = new IndexStatusResponse(
                 completeTeamNum, ongoingTeamNum, endTime, emergencyMessageContent, generalMessageContent
         );
-
-//        System.out.println("===== 서비스에서 반환 직전 데이터 확인 =====");
-//        System.out.println("완료된 팀 개수: " + response.getCompletedTeam().size());
-//        System.out.println("진행중인 팀 개수: " + response.getWaitingTeam().size());
-//        System.out.println("======================================");
-
 
 
         return response;
