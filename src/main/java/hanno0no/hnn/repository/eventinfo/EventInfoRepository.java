@@ -20,10 +20,10 @@ public interface EventInfoRepository extends JpaRepository<EventInfo, Integer> {
     @Query("SELECT e.endTime FROM EventInfo e WHERE e.eventId = :eventId")
     Optional<LocalDateTime> findEndTimeByEventId(@Param("eventId") Integer eventId);        // 행사가 끝나는 시간 로딩
 
-    @Query("SELECT e from EventInfo e where e.isOpen = true ")
+    @Query("SELECT e from EventInfo e where e.open = true ")
     Optional<EventInfo> findByIsOpen();
 
-    @Query("SELECT e from EventInfo e where e.isOpen = false ")
+    @Query("SELECT e from EventInfo e where e.open = false ")
     List<EventInfo> findAllByIsNotOpen();
 
 }

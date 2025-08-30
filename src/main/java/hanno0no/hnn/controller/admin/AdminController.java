@@ -26,6 +26,7 @@ public class AdminController {
     private final AdminUpdateService adminUpdateService;
     private final AdminSettingService adminSettingService;
     private final AdminSettingUpdateService adminSettingUpdateService;
+    private final CreateSettingService createSettingService;
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request) {
@@ -80,6 +81,24 @@ public class AdminController {
         adminSettingUpdateService.updateAllSettings(request);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/create/material")
+    public ResponseEntity<String> createMaterial(@RequestBody MaterialCreateRequest request) {
+        String name = createSettingService.createMaterial(request);
+        return ResponseEntity.ok(name+"재질이 성공적으로 추가되었습니다.");
+    }
+
+    @PostMapping("/create/message")
+    public ResponseEntity<String> createMessage(@RequestBody MessageCreateRequest request) {
+        Integer messageId = createSettingService.createMessage(request);
+        return ResponseEntity.ok("메시지가 성공적으로 추가되었습니다. ID:" +messageId);
+    }
+
+    @PostMapping("/create/eventinfo")
+    public ResponseEntity<String> createEventInfo(@RequestBody EventInfoCreateRequest request) {
+        String eventname = createSettingService.createEventInfo(request);
+        return ResponseEntity.ok(eventname + "대회가 성공적으로 추가되었습니다.");
     }
 
 }

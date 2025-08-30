@@ -29,12 +29,12 @@ public class EventInfo {
     private LocalDateTime endTime;
 
     @Column(name = "is_open")
-    private boolean isOpen;
+    private boolean open;
 
     @Column(name = "description")
     private String description;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
     
 }
