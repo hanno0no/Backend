@@ -4,8 +4,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "material")
 public class Material {
 
@@ -17,28 +21,6 @@ public class Material {
     private String materialName;
 
     @Column(name = "is_active")
-    private boolean isActive;
+    private boolean active;
 
-    public Material() {}
-
-    public int getMaterialNum() {
-        return materialNum;
-    }
-    public void setMaterialNum(int materialNum) {
-        this.materialNum = materialNum;
-    }
-
-    public String getMaterialName() {
-        return materialName;
-    }
-    public void setMaterialName(String materialName) {
-        this.materialName = materialName;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-    public void setActive(boolean active) {
-        isActive = active;
-    }
 }

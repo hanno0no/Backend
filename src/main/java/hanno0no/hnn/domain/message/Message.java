@@ -23,12 +23,12 @@ public class Message {
     private String content;
 
     @Column(name = "is_emergency")
-    private boolean isEmergency;
+    private boolean emergency;
 
     @Column(name = "is_display")
-    private boolean isDisplay;
+    private boolean display;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
 
