@@ -25,6 +25,7 @@ public class AdminController {
     private final AdminCheckService adminCheckService;
     private final AdminUpdateService adminUpdateService;
     private final AdminSettingService adminSettingService;
+    private final AdminSettingUpdateService adminSettingUpdateService;
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request) {
@@ -72,6 +73,13 @@ public class AdminController {
     public ResponseEntity setting() {
 
         return ResponseEntity.ok(adminSettingService.getAdminSetting());
+    }
+
+    @PatchMapping("/setting")
+    public ResponseEntity<Void> updateSetting(@RequestBody AdminSettingRequest request) {
+        adminSettingUpdateService.updateAllSettings(request);
+
+        return ResponseEntity.ok().build();
     }
 
 }
