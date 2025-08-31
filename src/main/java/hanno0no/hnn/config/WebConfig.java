@@ -11,7 +11,9 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 1. 모든 경로에 대해
                 .allowedOrigins("http://localhost:5173",
-                                "http://localhost:8080"
+                                "http://localhost:8080",
+                                "https://hanno0no.vercel.app",
+                                "http://hanno0no.vercel.app"
                 ) // 2. 이 출처의 요청을 허용
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") // 3. 허용할 HTTP 메서드
                 .allowedHeaders("Authorization", "Content-Type") // 4. 허용할 헤더 (Authorization 추가가 핵심!)
