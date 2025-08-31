@@ -1,5 +1,4 @@
 # 1. 베이스 이미지 선택 (Java 17 사용)
-
 FROM openjdk:21-jdk-slim
 
 # 2. 작업 디렉토리 설정
