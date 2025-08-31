@@ -27,6 +27,9 @@ public class Orders {
     @Column(name = "ordered_at", insertable = false, updatable = false)
     private LocalDateTime orderedAt;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @ManyToOne
     @JoinColumn(name = "team_num")
     private Team team;
@@ -42,6 +45,5 @@ public class Orders {
     @ManyToOne
     @JoinColumn(name = "admin_id")
     private AdminUser admin;
-
 
 }
