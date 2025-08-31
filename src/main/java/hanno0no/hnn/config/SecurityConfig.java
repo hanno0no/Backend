@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -31,13 +32,17 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // '/api/v1/admin/login' 과 '/api/v1/admins/signup'은 누구나 접근 가능
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/hnn/admin/login",
                                 "/hnn/admins/signup",
-                                "hnn/index",
-                                "hnn/checkStatus",
-                                "hnn/checkStatus/view",
-                                "hnn/registar"
+                                "/hnn/index",
+                                "/hnn/checkStatus",
+                                "/hnn/checkStatus/view",
+                                "/hnn/registar",
+                                "/hnn/registar/getmaterial",
+                                "/hnn/registar/getstate",
+                                "/hnn/registar/getadminname"
                         ).permitAll()
 
                         // '/hnn/admin/**' 경로는 'ADMIN' 역할을 가진 사용자만 접근 가능

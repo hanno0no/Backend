@@ -24,6 +24,8 @@ public interface MaterialRepository extends JpaRepository<Material, Integer> {
 
     Optional<Material> findByMaterialName(String materialName);
 
+    @Query("select m from Material m where m.active = true")
+    List<Material> findAllByActive();
 
 
 }

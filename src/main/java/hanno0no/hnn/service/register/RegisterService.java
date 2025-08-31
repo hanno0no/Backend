@@ -1,10 +1,12 @@
 package hanno0no.hnn.service.register;
 
 
+import hanno0no.hnn.domain.adminuser.AdminUser;
 import hanno0no.hnn.domain.material.Material;
 import hanno0no.hnn.domain.orders.Orders;
 import hanno0no.hnn.domain.state.State;
 import hanno0no.hnn.domain.team.Team;
+import hanno0no.hnn.repository.adminuser.AdminUserRepository;
 import hanno0no.hnn.repository.material.MaterialRepository;
 import hanno0no.hnn.repository.orders.OrdersRepository;
 import hanno0no.hnn.repository.state.StateRepository;
@@ -14,6 +16,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RegisterService {
@@ -22,6 +27,7 @@ public class RegisterService {
     private final TeamRepository teamRepository;
     private final MaterialRepository materialRepository;
     private final StateRepository stateRepository;
+    private final AdminUserRepository adminUserRepository;
 
     @Transactional // ✨ 데이터를 DB에 쓰는 작업은 반드시 @Transactional을 붙여야 합니다.
     public int createOrder(RegisterRequest requestDto) {
@@ -72,6 +78,38 @@ public class RegisterService {
         }
 
         return "";
+    }
+
+
+    public List<String> getMaterialNames() {
+        List<String> materialNames = new ArrayList<>();
+
+        List<Material> materials = materialRepository.findAllByActive();
+        for (Material material : materials) {
+            materialNames.add(material.getMaterialName());
+        }
+
+        return materialNames;
+    }
+
+    public List<String> getStateNames() {
+        List<String> stateNames = new ArrayList<>();
+        List<State> states = stateRepository.findAll();
+        for (State state : states) {
+            stateNames.add(state.getState());
+        }
+
+        return stateNames;
+    }
+
+    public List<String> getAdminNames() {
+        List<String> adminNames = new ArrayList<>();
+        List<AdminUser> adminUsers = adminUserRepository.findAll();
+        for (AdminUser adminUser : adminUsers) {
+            adminNames.add(adminUser.getUsername());
+        }
+
+        return adminNames;
     }
 
 }

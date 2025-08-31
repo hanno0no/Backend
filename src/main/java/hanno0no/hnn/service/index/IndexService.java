@@ -11,8 +11,10 @@ import hanno0no.hnn.repository.state.StateRepository;
 import hanno0no.hnn.response.index.IndexStatusResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,7 +48,9 @@ public class IndexService {
         Integer rejectionStateId = stateRepository.findStateIdByState("rejection")
                 .orElseThrow(() -> new EntityNotFoundException("'rejection' 상태의 ID를 찾을 수 없습니다."));
 
-        List<Orders> completeTeams = ordersRepository.findOrdersByStateId(completeStateId);
+//        List<Orders> completeTeams = ordersRepository.findOrdersByStateId(completeStateId);
+
+        List<Orders> completeTeams = ordersRepository.findTop9CompletedOrders(completeStateId, PageRequest.of(0, 9));
 
 //        List<String> completeTeamNum = completeTeams.stream().map(order -> order.getTeam().getTeamNum()).collect(Collectors.toList());
 //        Collections.reverse(completeTeamNum);
