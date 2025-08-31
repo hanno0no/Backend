@@ -11,6 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import hanno0no.hnn.service.admin.DeleteSettingService;
+import org.springframework.web.bind.annotation.DeleteMapping; 
+import org.springframework.web.bind.annotation.PathVariable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +31,7 @@ public class AdminController {
     private final AdminSettingService adminSettingService;
     private final AdminSettingUpdateService adminSettingUpdateService;
     private final CreateSettingService createSettingService;
+    private final DeleteSettingService deleteSettingService;
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request) {
@@ -101,4 +106,21 @@ public class AdminController {
         return ResponseEntity.ok(eventname + "대회가 성공적으로 추가되었습니다.");
     }
 
+    @DeleteMapping("/delete/material/{materialId}")
+    public ResponseEntity<String> deleteMaterial(@PathVariable Integer materialId) {
+        deleteSettingService.deleteMaterial(materialId);
+        return ResponseEntity.ok("재질이 성공적으로 삭제되었습니다. ID: " + materialId);
+    }
+
+    @DeleteMapping("/delete/message/{messageId}")
+    public ResponseEntity<String> deleteMessage(@PathVariable Integer messageId) {
+        deleteSettingService.deleteMessage(messageId);
+        return ResponseEntity.ok("메시지가 성공적으로 삭제되었습니다. ID: " + messageId);
+    }
+
+    @DeleteMapping("/delete/eventinfo/{eventId}")
+    public ResponseEntity<String> deleteEventInfo(@PathVariable Integer eventId) {
+        deleteSettingService.deleteEventInfo(eventId);
+        return ResponseEntity.ok("이벤트가 성공적으로 삭제되었습니다. ID: " + eventId);
+    }
 }
