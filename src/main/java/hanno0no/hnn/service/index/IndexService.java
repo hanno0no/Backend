@@ -62,7 +62,9 @@ public class IndexService {
 
 
         List<Integer> excludedStateIds = Arrays.asList(completeStateId, rejectionStateId);
-        List<Orders> ongoingTeams = ordersRepository.findByState_StateIdNotIn(excludedStateIds);
+//        List<Orders> ongoingTeams = ordersRepository.findByState_StateIdNotIn(excludedStateIds);
+
+        List<Orders> ongoingTeams = ordersRepository.findOldestOngoingOrders(excludedStateIds, PageRequest.of(0, 12));
 
 //        List<String> ongoingTeamNum = ongoingTeams.stream().map(order -> order.getTeam().getTeamNum()).collect(Collectors.toList());
 //        Collections.reverse(ongoingTeamNum);
@@ -70,7 +72,7 @@ public class IndexService {
         List<String> ongoingTeamNum = ongoingTeams.stream()
                 .map(order -> order.getTeam().getTeamNum() + "_" + order.getOrderId())
                 .collect(Collectors.toList());
-        Collections.reverse(ongoingTeamNum);
+//        Collections.reverse(ongoingTeamNum);
 
 
         EventInfo activeEvent = eventInfoRepository.findByIsOpen()
