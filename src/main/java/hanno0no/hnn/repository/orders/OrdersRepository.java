@@ -40,4 +40,7 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
 
     @Query("SELECT o FROM Orders o WHERE o.state.stateId = :stateNum ORDER BY o.updatedAt DESC")
     List<Orders> findTop9CompletedOrders(@Param("stateNum") Integer stateNum, Pageable pageable);
+
+    @Query("SELECT o FROM Orders o WHERE o.state.stateId NOT IN :stateNums ORDER BY o.orderedAt ASC")
+    List<Orders> findOldestOngoingOrders(@Param("stateNums") List<Integer> stateNums, Pageable pageable);
 }
