@@ -15,6 +15,8 @@ public class EventInfoDto {
     private LocalDateTime endTime;
     private boolean isOpen;
     private String description;
+    private Integer completedLimit;
+    private Integer waitingLimit;
 
     public EventInfoDto(EventInfo eventInfo) {
         this.eventId = eventInfo.getEventId();
@@ -23,6 +25,8 @@ public class EventInfoDto {
         this.endTime = eventInfo.getEndTime();
         this.isOpen = eventInfo.isOpen();
         this.description = eventInfo.getDescription();
+        this.completedLimit = eventInfo.getCompletedLimit();
+        this.waitingLimit = eventInfo.getWaitingLimit();
     }
 
 }

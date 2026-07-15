@@ -1,8 +1,11 @@
 package hanno0no.hnn.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -10,7 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.http.HttpMethod;
+
+import java.nio.charset.StandardCharsets;
 
 @Configuration
 @EnableWebSecurity
@@ -21,7 +25,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // 비밀번호를 안전하게 암호화하기 위한 BCryptPasswordEncoder
         return new BCryptPasswordEncoder();
     }
 
@@ -30,30 +33,40 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.getWriter().write("{\"message\":\"인증이 필요합니다.\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.getWriter().write("{\"message\":\"접근 권한이 없습니다.\"}");
+                        })
+                )
                 .authorizeHttpRequests(auth -> auth
-                        // '/api/v1/admin/login' 과 '/api/v1/admins/signup'은 누구나 접근 가능
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/hnn/admin/login",
-                                "/hnn/admins/signup",
+                                "/hnn/admin/signup",
                                 "/hnn/index",
                                 "/hnn/checkStatus",
-                                "/hnn/checkStatus/view",
+                                "/hnn/register",
+                                "/hnn/register/getmaterial",
+                                "/hnn/register/getstate",
+                                "/hnn/register/getadminname",
                                 "/hnn/registar",
                                 "/hnn/registar/getmaterial",
                                 "/hnn/registar/getstate",
                                 "/hnn/registar/getadminname"
                         ).permitAll()
-
-                        // '/hnn/admin/**' 경로는 'ADMIN' 역할을 가진 사용자만 접근 가능
                         .requestMatchers("/hnn/admin/**").hasRole("admin")
-
-                        // 그 외의 다른 모든 요청은 일단 인증만 되면 접근 가능하도록 설정 (필요에 따라 수정)
                         .anyRequest().authenticated()
                 )
-                // ✨ Spring Security의 기본 필터 앞에 우리가 만든 JWT 필터를 추가
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
 
         return http.build();
     }

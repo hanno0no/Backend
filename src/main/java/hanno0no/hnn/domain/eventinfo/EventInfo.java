@@ -36,5 +36,11 @@ public class EventInfo {
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
+    @Column(name = "completed_limit")
+    private Integer completedLimit = 9;
+
+    @Column(name = "waiting_limit")
+    private Integer waitingLimit = 12;
+
 }

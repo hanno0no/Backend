@@ -46,4 +46,7 @@ public class Orders {
     @JoinColumn(name = "admin_id")
     private AdminUser admin;
 
+    @Column(name = "hidden_from_dashboard")
+    private boolean hiddenFromDashboard = false;
+
 }

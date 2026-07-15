@@ -38,8 +38,8 @@ public class RegisterService {
         Material material = materialRepository.findByMaterialName(requestDto.getMaterial())
                 .orElseThrow(() -> new IllegalArgumentException("재질을 찾을 수 없습니다."));
 
-        State initialState = stateRepository.findByState("submission") // 'submission' 상태를 DB에서 조회
-                .orElseThrow(() -> new IllegalStateException("초기 상태(submission)를 찾을 수 없습니다."));
+        State initialState = stateRepository.findByState("submitted")
+                .orElseThrow(() -> new IllegalStateException("초기 상태(submitted)를 찾을 수 없습니다."));
 
         Orders newOrder = new Orders();
 

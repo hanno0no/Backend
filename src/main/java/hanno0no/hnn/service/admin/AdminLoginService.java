@@ -1,7 +1,7 @@
 package hanno0no.hnn.service.admin;
 
-
 import hanno0no.hnn.domain.adminuser.AdminUser;
+import hanno0no.hnn.exception.UnauthorizedException;
 import hanno0no.hnn.repository.adminuser.AdminUserRepository;
 import hanno0no.hnn.request.admin.AdminLoginRequest;
 import hanno0no.hnn.util.JwtUtil;
@@ -18,18 +18,13 @@ public class AdminLoginService {
     private final JwtUtil jwtUtil;
 
     public String login(AdminLoginRequest request) {
-
         AdminUser adminUser = adminUserRepository.findByUserName(request.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다."));
+                .orElseThrow(() -> new UnauthorizedException("아이디 또는 비밀번호가 일치하지 않습니다."));
 
         if (!passwordEncoder.matches(request.getPassword(), adminUser.getPassword_hash())) {
-            throw new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다.");
+            throw new UnauthorizedException("아이디 또는 비밀번호가 일치하지 않습니다.");
         }
 
         return jwtUtil.generateToken(adminUser.getUserName());
-
     }
-
-
-
 }

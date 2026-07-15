@@ -1,6 +1,5 @@
 package hanno0no.hnn.service.index;
 
-
 import hanno0no.hnn.domain.eventinfo.EventInfo;
 import hanno0no.hnn.domain.message.Message;
 import hanno0no.hnn.domain.orders.Orders;
@@ -14,93 +13,82 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class IndexService {
 
-    /*
-    여기서 불러와야하는 정보
-    1. 완료된 팀 번호 -> 리스트          // orders 테이블에서 조회해야함           // 이거 정렬은 가장 최근에 완료된 순서로 정렬해야할듯
-    2. 진행중인 팀 번호 -> 리스트         // orders 테이블에서 조회해야함
-    3. 끝나는 시간                       // event_info 테이블에서 조회
-    4. 중요 공지                        // message 테이블에서 조회
-    5. 일반 공지   -> 리스트               // message 테이블에서 조회
-     */
+    private static final int DEFAULT_COMPLETED_LIMIT = 9;
+    private static final int DEFAULT_WAITING_LIMIT = 12;
 
     private final OrdersRepository ordersRepository;
     private final EventInfoRepository eventInfoRepository;
     private final MessageRepository messageRepository;
     private final StateRepository stateRepository;
 
-
     public IndexStatusResponse getIndexInfo() {
+        EventInfo activeEvent = eventInfoRepository.findByIsOpen()
+                .orElseThrow(() -> new EntityNotFoundException("현재 진행중인 이벤트가 없습니다."));
 
-        Integer completeStateId = stateRepository.findStateIdByState("print")   // 프린트 완료 = 최종 완료
-                .orElseThrow(() -> new EntityNotFoundException("'print' 상태의 ID를 찾을 수 없습니다."));
-        Integer rejectionStateId = stateRepository.findStateIdByState("rejection")
-                .orElseThrow(() -> new EntityNotFoundException("'rejection' 상태의 ID를 찾을 수 없습니다."));
+        int completedLimit = resolveLimit(activeEvent.getCompletedLimit(), DEFAULT_COMPLETED_LIMIT);
+        int waitingLimit = resolveLimit(activeEvent.getWaitingLimit(), DEFAULT_WAITING_LIMIT);
 
-//        List<Orders> completeTeams = ordersRepository.findOrdersByStateId(completeStateId);
+        Integer completeStateId = stateRepository.findStateIdByState("print_complete")
+                .orElseThrow(() -> new EntityNotFoundException("'print_complete' 상태의 ID를 찾을 수 없습니다."));
 
-        List<Orders> completeTeams = ordersRepository.findTop9CompletedOrders(completeStateId, PageRequest.of(0, 9));
+        Integer acceptedStateId = stateRepository.findStateIdByState("accepted")
+                .orElseThrow(() -> new EntityNotFoundException("'accepted' 상태의 ID를 찾을 수 없습니다."));
+        Integer designCompleteStateId = stateRepository.findStateIdByState("design_complete")
+                .orElseThrow(() -> new EntityNotFoundException("'design_complete' 상태의 ID를 찾을 수 없습니다."));
 
-//        List<String> completeTeamNum = completeTeams.stream().map(order -> order.getTeam().getTeamNum()).collect(Collectors.toList());
-//        Collections.reverse(completeTeamNum);
+        List<Orders> completeTeams = ordersRepository.findTopCompletedOrders(
+                completeStateId, PageRequest.of(0, completedLimit));
 
         List<String> completeTeamNum = completeTeams.stream()
                 .map(order -> order.getTeam().getTeamNum() + "_" + order.getOrderId())
                 .collect(Collectors.toList());
         Collections.reverse(completeTeamNum);
 
-
-        List<Integer> excludedStateIds = Arrays.asList(completeStateId, rejectionStateId);
-//        List<Orders> ongoingTeams = ordersRepository.findByState_StateIdNotIn(excludedStateIds);
-
-        List<Orders> ongoingTeams = ordersRepository.findOldestOngoingOrders(excludedStateIds, PageRequest.of(0, 12));
-
-//        List<String> ongoingTeamNum = ongoingTeams.stream().map(order -> order.getTeam().getTeamNum()).collect(Collectors.toList());
-//        Collections.reverse(ongoingTeamNum);
+        List<Integer> waitingStateIds = Arrays.asList(acceptedStateId, designCompleteStateId);
+        List<Orders> ongoingTeams = ordersRepository.findOldestWaitingOrders(
+                waitingStateIds, PageRequest.of(0, waitingLimit));
 
         List<String> ongoingTeamNum = ongoingTeams.stream()
                 .map(order -> order.getTeam().getTeamNum() + "_" + order.getOrderId())
                 .collect(Collectors.toList());
-//        Collections.reverse(ongoingTeamNum);
 
-
-        EventInfo activeEvent = eventInfoRepository.findByIsOpen()
-                .orElseThrow(() -> new EntityNotFoundException("현재 진행중인 이벤트가 없습니다."));
-        Integer eventId = activeEvent.getEventId();
-
-
-        LocalDateTime endTime = eventInfoRepository.findEndTimeByEventId(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 이벤트를 찾을 수 없습니다."));
+        LocalDateTime endTime = activeEvent.getEndTime();
+        if (endTime == null) {
+            endTime = eventInfoRepository.findEndTimeByEventId(activeEvent.getEventId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 이벤트를 찾을 수 없습니다."));
+        }
 
         List<Message> emergencyMessage = messageRepository.findAllByEmergency();
-
-        List<String> emergencyMessageContent = emergencyMessage.stream().map(message -> message.getContent()).collect(Collectors.toList());
+        List<String> emergencyMessageContent = emergencyMessage.stream()
+                .map(Message::getContent)
+                .collect(Collectors.toList());
         Collections.reverse(emergencyMessageContent);
 
         List<Message> generalMessage = messageRepository.findAllByNonEmergency();
-        List<String> generalMessageContent = generalMessage.stream().map(message -> message.getContent()).collect(Collectors.toList());
+        List<String> generalMessageContent = generalMessage.stream()
+                .map(Message::getContent)
+                .collect(Collectors.toList());
         Collections.reverse(generalMessageContent);
 
-        IndexStatusResponse response = new IndexStatusResponse(
+        return new IndexStatusResponse(
                 completeTeamNum, ongoingTeamNum, endTime, emergencyMessageContent, generalMessageContent
         );
-
-
-        return response;
-
-
     }
 
-
+    private int resolveLimit(Integer configured, int defaultValue) {
+        if (configured == null || configured <= 0) {
+            return defaultValue;
+        }
+        return configured;
+    }
 }

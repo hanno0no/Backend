@@ -13,9 +13,7 @@ import hanno0no.hnn.response.admin.MessageDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.accept.MappingMediaTypeFileExtensionResolver;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,23 +32,20 @@ public class AdminSettingService {
         List<Material> materials = materialRepository.findAll();
 
         EventInfo openEventInfo = eventInfoRepository.findByIsOpen()
-                .orElseThrow(() -> new RuntimeException("No event info found"));
+                .orElseThrow(() -> new IllegalArgumentException("활성 이벤트가 없습니다."));
 
         EventInfoDto openEventInfoDto = new EventInfoDto(openEventInfo);
         List<EventInfoDto> eventInfoDtos = eventInfos.stream().map(EventInfoDto::new).collect(Collectors.toList());
         List<MessageDto> messageDtos = messages.stream().map(MessageDto::new).collect(Collectors.toList());
         List<MaterialDto> materialDtos = materials.stream().map(MaterialDto::new).collect(Collectors.toList());
 
-
         return AdminSettingResponse.builder()
                 .eventInfos(eventInfoDtos)
                 .messages(messageDtos)
                 .materials(materialDtos)
                 .openEventInfo(openEventInfoDto)
+                .completedLimit(openEventInfo.getCompletedLimit())
+                .waitingLimit(openEventInfo.getWaitingLimit())
                 .build();
-
-
     }
-
-
 }

@@ -75,8 +75,18 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/{orderId}/hide")
+    public ResponseEntity<Void> hideOrder(
+            @PathVariable Integer orderId,
+            @RequestBody(required = false) OrderHideRequest request
+    ) {
+        Boolean hidden = request == null ? Boolean.TRUE : request.getHidden();
+        adminUpdateService.updateOrderHidden(orderId, hidden);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/setting")
-    public ResponseEntity setting() {
+    public ResponseEntity<AdminSettingResponse> setting() {
 
         return ResponseEntity.ok(adminSettingService.getAdminSetting());
     }

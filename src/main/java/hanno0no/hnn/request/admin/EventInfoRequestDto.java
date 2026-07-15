@@ -17,4 +17,6 @@ public class EventInfoRequestDto {
     private LocalDateTime endTime;
     private Boolean isOpen;
     private String description;
+    private Integer completedLimit;
+    private Integer waitingLimit;
 }

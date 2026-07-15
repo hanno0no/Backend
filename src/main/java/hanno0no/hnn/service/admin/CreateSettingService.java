@@ -52,6 +52,8 @@ public class CreateSettingService {
         eventInfo.setEndTime(request.getEndTime());
         eventInfo.setDescription(request.getDescription());
         eventInfo.setOpen(request.isOpen());
+        eventInfo.setCompletedLimit(9);
+        eventInfo.setWaitingLimit(12);
 
         EventInfo savedEventInfo = eventInfoRepository.save(eventInfo);
         return savedEventInfo.getEventName();

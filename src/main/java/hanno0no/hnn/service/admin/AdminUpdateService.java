@@ -1,9 +1,9 @@
 package hanno0no.hnn.service.admin;
 
-
 import hanno0no.hnn.domain.adminuser.AdminUser;
 import hanno0no.hnn.domain.orders.Orders;
 import hanno0no.hnn.domain.state.State;
+import hanno0no.hnn.domain.state.StateTransitionValidator;
 import hanno0no.hnn.repository.adminuser.AdminUserRepository;
 import hanno0no.hnn.repository.orders.OrdersRepository;
 import hanno0no.hnn.repository.state.StateRepository;
@@ -18,8 +18,7 @@ public class AdminUpdateService {
     private final OrdersRepository ordersRepository;
     private final StateRepository stateRepository;
     private final AdminUserRepository adminUserRepository;
-
-
+    private final StateTransitionValidator stateTransitionValidator;
 
     @Transactional
     public void updateOrderStatus(Integer orderId, String newStatus) {
@@ -29,8 +28,10 @@ public class AdminUpdateService {
         State newState = stateRepository.findByState(newStatus)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상태입니다: " + newStatus));
 
-        order.setState(newState);
+        String currentStatus = order.getState().getState();
+        stateTransitionValidator.validate(currentStatus, newStatus);
 
+        order.setState(newState);
     }
 
     @Transactional
@@ -38,11 +39,29 @@ public class AdminUpdateService {
         Orders order = ordersRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다. ID: " + orderId));
 
+        if (isUnassigned(newManagerName)) {
+            order.setAdmin(null);
+            return;
+        }
+
         AdminUser newManager = adminUserRepository.findByUserName(newManagerName)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다: " + newManagerName));
 
         order.setAdmin(newManager);
-
     }
 
+    @Transactional
+    public void updateOrderHidden(Integer orderId, Boolean hidden) {
+        Orders order = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다. ID: " + orderId));
+
+        boolean hide = hidden == null || hidden;
+        order.setHiddenFromDashboard(hide);
+    }
+
+    private boolean isUnassigned(String managerName) {
+        return managerName == null
+                || managerName.isBlank()
+                || "미지정".equals(managerName.trim());
+    }
 }

@@ -1,6 +1,5 @@
 package hanno0no.hnn.service.admin;
 
-
 import hanno0no.hnn.domain.eventinfo.EventInfo;
 import hanno0no.hnn.domain.material.Material;
 import hanno0no.hnn.domain.message.Message;
@@ -23,11 +22,8 @@ public class AdminSettingUpdateService {
     private final MessageRepository messageRepository;
     private final MaterialRepository materialRepository;
 
-
     @Transactional
     public void updateAllSettings(AdminSettingRequest request) {
-
-
         if (request.getEventInfoRequestDtos() != null) {
             for (EventInfoRequestDto dto : request.getEventInfoRequestDtos()) {
                 EventInfo entity = eventInfoRepository.findById(dto.getEventId())
@@ -37,8 +33,20 @@ public class AdminSettingUpdateService {
                 if (dto.getDescription() != null) entity.setDescription(dto.getDescription());
                 if (dto.getStartTime() != null) entity.setStartTime(dto.getStartTime());
                 if (dto.getEndTime() != null) entity.setEndTime(dto.getEndTime());
-                if (dto.getIsOpen() != null) entity.setOpen(dto.getIsOpen()); // DTO의 isOpen()이 Boolean 타입이어야 함
+                if (dto.getIsOpen() != null) entity.setOpen(dto.getIsOpen());
+                if (dto.getCompletedLimit() != null) entity.setCompletedLimit(dto.getCompletedLimit());
+                if (dto.getWaitingLimit() != null) entity.setWaitingLimit(dto.getWaitingLimit());
+            }
+        }
 
+        if (request.getCompletedLimit() != null || request.getWaitingLimit() != null) {
+            EventInfo openEvent = eventInfoRepository.findByIsOpen()
+                    .orElseThrow(() -> new IllegalArgumentException("활성 이벤트가 없습니다."));
+            if (request.getCompletedLimit() != null) {
+                openEvent.setCompletedLimit(request.getCompletedLimit());
+            }
+            if (request.getWaitingLimit() != null) {
+                openEvent.setWaitingLimit(request.getWaitingLimit());
             }
         }
 
@@ -49,7 +57,6 @@ public class AdminSettingUpdateService {
 
                 if (dto.getMaterialName() != null) entity.setMaterialName(dto.getMaterialName());
                 if (dto.getIsActive() != null) entity.setActive(dto.getIsActive());
-
             }
         }
 
@@ -63,8 +70,5 @@ public class AdminSettingUpdateService {
                 if (dto.getIsEmergency() != null) entity.setEmergency(dto.getIsEmergency());
             }
         }
-
-
     }
-
 }

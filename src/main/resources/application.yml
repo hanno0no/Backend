@@ -19,6 +19,6 @@ spring:
       validation-timeout: 3000
 
 jwt:
-  # Render의 환경 변수에서 JWT 비밀 키와 만료 시간을 가져옵니다.
+  # JWT_EXPIRATION_TIME 미설정 시 기본 12시간 (밀리초)
   secret: ${JWT_SECRET_KEY}
-  expiration: ${JWT_EXPIRATION_TIME}
+  expiration: ${JWT_EXPIRATION_TIME:43200000}
