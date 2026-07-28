@@ -41,7 +41,7 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
     @Query("SELECT o FROM Orders o WHERE o.state.stateId = :stateNum AND o.hiddenFromDashboard = false ORDER BY o.updatedAt DESC")
     List<Orders> findTopCompletedOrders(@Param("stateNum") Integer stateNum, Pageable pageable);
 
-    @Query("SELECT o FROM Orders o WHERE o.state.stateId IN :stateNums ORDER BY o.orderedAt ASC")
+    @Query("SELECT o FROM Orders o WHERE o.state.stateId IN :stateNums AND o.hiddenFromDashboard = false ORDER BY o.orderedAt ASC")
     List<Orders> findOldestWaitingOrders(@Param("stateNums") List<Integer> stateNums, Pageable pageable);
 
     @Query("SELECT o FROM Orders o WHERE o.state.stateId NOT IN :stateNums ORDER BY o.orderedAt ASC")
