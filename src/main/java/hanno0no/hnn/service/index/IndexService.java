@@ -46,8 +46,15 @@ public class IndexService {
         Integer designCompleteStateId = stateRepository.findStateIdByState("design_complete")
                 .orElseThrow(() -> new EntityNotFoundException("'design_complete' 상태의 ID를 찾을 수 없습니다."));
 
+        LocalDateTime start = activeEvent.getStartTime();
+        LocalDateTime end = activeEvent.getEndTime();
+        if (end == null) {
+            end = eventInfoRepository.findEndTimeByEventId(activeEvent.getEventId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 이벤트를 찾을 수 없습니다."));
+        }
+
         List<Orders> completeTeams = ordersRepository.findTopCompletedOrders(
-                completeStateId, PageRequest.of(0, completedLimit));
+                completeStateId, start, end, PageRequest.of(0, completedLimit));
 
         List<String> completeTeamNum = completeTeams.stream()
                 .map(order -> order.getTeam().getTeamNum() + "_" + order.getOrderId())
@@ -56,17 +63,11 @@ public class IndexService {
 
         List<Integer> waitingStateIds = Arrays.asList(acceptedStateId, designCompleteStateId);
         List<Orders> ongoingTeams = ordersRepository.findOldestWaitingOrders(
-                waitingStateIds, PageRequest.of(0, waitingLimit));
+                waitingStateIds, start, end, PageRequest.of(0, waitingLimit));
 
         List<String> ongoingTeamNum = ongoingTeams.stream()
                 .map(order -> order.getTeam().getTeamNum() + "_" + order.getOrderId())
                 .collect(Collectors.toList());
-
-        LocalDateTime endTime = activeEvent.getEndTime();
-        if (endTime == null) {
-            endTime = eventInfoRepository.findEndTimeByEventId(activeEvent.getEventId())
-                    .orElseThrow(() -> new EntityNotFoundException("해당 이벤트를 찾을 수 없습니다."));
-        }
 
         List<Message> emergencyMessage = messageRepository.findAllByEmergency();
         List<String> emergencyMessageContent = emergencyMessage.stream()
@@ -81,7 +82,7 @@ public class IndexService {
         Collections.reverse(generalMessageContent);
 
         return new IndexStatusResponse(
-                completeTeamNum, ongoingTeamNum, endTime, emergencyMessageContent, generalMessageContent
+                completeTeamNum, ongoingTeamNum, end, emergencyMessageContent, generalMessageContent
         );
     }
 

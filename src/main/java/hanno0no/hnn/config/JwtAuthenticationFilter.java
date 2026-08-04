@@ -2,22 +2,20 @@ package hanno0no.hnn.config;
 
 import hanno0no.hnn.service.admin.AdminUserDetailsService;
 import hanno0no.hnn.util.JwtUtil;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -51,21 +49,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
-        } catch (ExpiredJwtException e) {
-            writeUnauthorized(response, "토큰이 만료되었습니다.");
-            return;
-        } catch (JwtException | IllegalArgumentException e) {
-            writeUnauthorized(response, "유효하지 않은 토큰입니다.");
-            return;
+        } catch (JwtException | IllegalArgumentException | UsernameNotFoundException e) {
+            // 만료/위조 토큰이어도 여기서 막지 않음.
+            // 공개 API(/index 등)는 permitAll로 통과시키고, 보호 API는 SecurityEntryPoint가 401 처리.
+            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private void writeUnauthorized(HttpServletResponse response, String message) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getWriter().write("{\"message\":\"" + message + "\"}");
     }
 }

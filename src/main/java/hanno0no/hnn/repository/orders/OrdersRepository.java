@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import org.springframework.data.domain.Pageable;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +31,11 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
     @Query("SELECT o FROM Orders o WHERE o.team.teamNum = :team")
     List<Orders> findByTeam(@Param("team") String team);         // team에 대한 모든 주문건 조회
 
+    @Query("SELECT o FROM Orders o WHERE o.team.teamNum = :team AND o.orderedAt >= :start AND o.orderedAt <= :end")
+    List<Orders> findByTeamAndOrderedAtBetween(@Param("team") String team,
+                                               @Param("start") LocalDateTime start,
+                                               @Param("end") LocalDateTime end);
+
 
     @Query("SELECT o FROM Orders o WHERE o.admin.userName = :username")
     List<Orders> findByAdmin(@Param("username") String username);
@@ -37,12 +43,37 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
     @Query("select o from Orders o where o.admin.userName = :username and o.state.stateId = :stateId")
     List<Orders> findByAdminAndStateId(@Param("username") String username, @Param("stateId") Integer stateId);
 
+    @Query("SELECT o FROM Orders o WHERE o.orderedAt >= :start AND o.orderedAt <= :end")
+    List<Orders> findByOrderedAtBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-    @Query("SELECT o FROM Orders o WHERE o.state.stateId = :stateNum AND o.hiddenFromDashboard = false ORDER BY o.updatedAt DESC")
-    List<Orders> findTopCompletedOrders(@Param("stateNum") Integer stateNum, Pageable pageable);
+    @Query("SELECT o FROM Orders o WHERE o.state.stateId = :stateId AND o.orderedAt >= :start AND o.orderedAt <= :end")
+    List<Orders> findOrdersByStateIdAndOrderedAtBetween(@Param("stateId") Integer stateId,
+                                                        @Param("start") LocalDateTime start,
+                                                        @Param("end") LocalDateTime end);
 
-    @Query("SELECT o FROM Orders o WHERE o.state.stateId IN :stateNums AND o.hiddenFromDashboard = false ORDER BY o.orderedAt ASC")
-    List<Orders> findOldestWaitingOrders(@Param("stateNums") List<Integer> stateNums, Pageable pageable);
+    @Query("SELECT o FROM Orders o WHERE o.admin.userName = :username AND o.orderedAt >= :start AND o.orderedAt <= :end")
+    List<Orders> findByAdminAndOrderedAtBetween(@Param("username") String username,
+                                                @Param("start") LocalDateTime start,
+                                                @Param("end") LocalDateTime end);
+
+    @Query("SELECT o FROM Orders o WHERE o.admin.userName = :username AND o.state.stateId = :stateId AND o.orderedAt >= :start AND o.orderedAt <= :end")
+    List<Orders> findByAdminAndStateIdAndOrderedAtBetween(@Param("username") String username,
+                                                          @Param("stateId") Integer stateId,
+                                                          @Param("start") LocalDateTime start,
+                                                          @Param("end") LocalDateTime end);
+
+
+    @Query("SELECT o FROM Orders o WHERE o.state.stateId = :stateNum AND o.hiddenFromDashboard = false AND o.orderedAt >= :start AND o.orderedAt <= :end ORDER BY o.updatedAt DESC")
+    List<Orders> findTopCompletedOrders(@Param("stateNum") Integer stateNum,
+                                        @Param("start") LocalDateTime start,
+                                        @Param("end") LocalDateTime end,
+                                        Pageable pageable);
+
+    @Query("SELECT o FROM Orders o WHERE o.state.stateId IN :stateNums AND o.hiddenFromDashboard = false AND o.orderedAt >= :start AND o.orderedAt <= :end ORDER BY o.orderedAt ASC")
+    List<Orders> findOldestWaitingOrders(@Param("stateNums") List<Integer> stateNums,
+                                         @Param("start") LocalDateTime start,
+                                         @Param("end") LocalDateTime end,
+                                         Pageable pageable);
 
     @Query("SELECT o FROM Orders o WHERE o.state.stateId NOT IN :stateNums ORDER BY o.orderedAt ASC")
     List<Orders> findOldestOngoingOrders(@Param("stateNums") List<Integer> stateNums, Pageable pageable);

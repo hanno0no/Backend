@@ -1,11 +1,11 @@
 package hanno0no.hnn.service.checkStatus;
 
 
+import hanno0no.hnn.domain.eventinfo.EventInfo;
 import hanno0no.hnn.domain.orders.Orders;
 import hanno0no.hnn.domain.team.Team;
-import hanno0no.hnn.repository.material.MaterialRepository;
+import hanno0no.hnn.repository.eventinfo.EventInfoRepository;
 import hanno0no.hnn.repository.orders.OrdersRepository;
-import hanno0no.hnn.repository.state.StateRepository;
 import hanno0no.hnn.repository.team.TeamRepository;
 import hanno0no.hnn.response.checkStatus.CheckStatusResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +35,7 @@ public class CheckStatusService {
 
     private final OrdersRepository ordersRepository;
     private final TeamRepository teamRepository;
+    private final EventInfoRepository eventInfoRepository;
 
 
 
@@ -42,7 +44,15 @@ public class CheckStatusService {
         Team team = teamRepository.findByTeamNum(teamNum)
                 .orElseThrow(() -> new IllegalArgumentException("입력하신 팀 번호(" + teamNum + ")를 찾을 수 없습니다."));
 
-        List<Orders> allOrders = ordersRepository.findByTeam(teamNum);
+        Optional<EventInfo> activeEvent = eventInfoRepository.findByIsOpen();
+        if (activeEvent.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        LocalDateTime start = activeEvent.get().getStartTime();
+        LocalDateTime end = activeEvent.get().getEndTime();
+
+        List<Orders> allOrders = ordersRepository.findByTeamAndOrderedAtBetween(teamNum, start, end);
 
         if (allOrders.isEmpty()) {
             return Collections.emptyList(); // new ArrayList<>() 와 동일
