@@ -51,31 +51,18 @@ public class AdminCheckService {
         LocalDateTime start = activeEvent.get().getStartTime();
         LocalDateTime end = activeEvent.get().getEndTime();
 
-        List<Orders> orders;
-
-        String status = orderSearchRequest.getStatus();
-        String manager = orderSearchRequest.getManager();
-
-        if (StringUtils.hasText(status) && StringUtils.hasText(manager)) {
-            int intStateId = stateRepository.findStateIdByState(orderSearchRequest.getStatus())
+        Integer stateId = null;
+        if (StringUtils.hasText(orderSearchRequest.getStatus())) {
+            stateId = stateRepository.findStateIdByState(orderSearchRequest.getStatus())
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상태(status) 이름입니다: " + orderSearchRequest.getStatus()));
+        }
 
-            orders = ordersRepository.findByAdminAndStateIdAndOrderedAtBetween(
-                    orderSearchRequest.getManager(), intStateId, start, end);
-        }
-        else if (StringUtils.hasText(status)) {
-            int intStateId = stateRepository.findStateIdByState(orderSearchRequest.getStatus())
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상태(status) 이름입니다: " + orderSearchRequest.getStatus()));
+        boolean unassigned = "unassigned".equals(orderSearchRequest.getManager());
+        String manager = unassigned ? null : textOrNull(orderSearchRequest.getManager());
+        String material = textOrNull(orderSearchRequest.getMaterial());
+        String teamNum = textOrNull(orderSearchRequest.getTeamNum());
 
-            orders = ordersRepository.findOrdersByStateIdAndOrderedAtBetween(intStateId, start, end);
-        }
-        else if (StringUtils.hasText(manager)) {
-            orders = ordersRepository.findByAdminAndOrderedAtBetween(
-                    orderSearchRequest.getManager(), start, end);
-        }
-        else {
-            orders = ordersRepository.findByOrderedAtBetween(start, end);
-        }
+        List<Orders> orders = ordersRepository.findByFilters(stateId, manager, unassigned, material, teamNum, start, end);
 
 
         if (orders.isEmpty()) {
@@ -85,24 +72,25 @@ public class AdminCheckService {
         List<AdminCheckResponse> responses = new ArrayList<>();
 
         for (Orders order : orders) {
-            int orderId = order.getOrderId();
-            String fileName = order.getFileName();
-            String teamNum = order.getTeam().getTeamNum();
-            String material = order.getMaterial().getMaterialName();
-            String state = order.getState().getState();
             String managerName = "";
-
             AdminUser admin = order.getAdmin();
             if (admin != null) {
                 managerName = admin.getUserName();
             }
-
-
-            responses.add(new AdminCheckResponse(orderId, fileName, teamNum, material, state, managerName));
-
+            responses.add(new AdminCheckResponse(
+                    order.getOrderId(),
+                    order.getFileName(),
+                    order.getTeam().getTeamNum(),
+                    order.getMaterial().getMaterialName(),
+                    order.getState().getState(),
+                    managerName));
         }
 
         return responses;
+    }
+
+    private static String textOrNull(String value) {
+        return StringUtils.hasText(value) ? value : null;
     }
 
 

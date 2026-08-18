@@ -57,6 +57,6 @@ public class AdminUpdateService {
     private boolean isUnassigned(String managerName) {
         return managerName == null
                 || managerName.isBlank()
-                || "미지정".equals(managerName.trim());
+                || "unassigned".equals(managerName.trim());
     }
 }

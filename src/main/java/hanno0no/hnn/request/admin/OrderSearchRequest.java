@@ -9,5 +9,6 @@ import lombok.Setter;
 public class OrderSearchRequest {
     private String status;
     private String manager;
-
+    private String material;
+    private String teamNum;
 }

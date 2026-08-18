@@ -43,6 +43,19 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
     @Query("select o from Orders o where o.admin.userName = :username and o.state.stateId = :stateId")
     List<Orders> findByAdminAndStateId(@Param("username") String username, @Param("stateId") Integer stateId);
 
+    @Query("SELECT o FROM Orders o LEFT JOIN o.admin a WHERE o.orderedAt >= :start AND o.orderedAt <= :end"
+            + " AND (:stateId IS NULL OR o.state.stateId = :stateId)"
+            + " AND ((:unassigned = true AND a IS NULL) OR (:unassigned = false AND (:username IS NULL OR a.userName = :username)))"
+            + " AND (:material IS NULL OR o.material.materialName = :material)"
+            + " AND (:teamNum IS NULL OR o.team.teamNum = :teamNum)")
+    List<Orders> findByFilters(@Param("stateId") Integer stateId,
+                               @Param("username") String username,
+                               @Param("unassigned") boolean unassigned,
+                               @Param("material") String material,
+                               @Param("teamNum") String teamNum,
+                               @Param("start") LocalDateTime start,
+                               @Param("end") LocalDateTime end);
+
     @Query("SELECT o FROM Orders o WHERE o.orderedAt >= :start AND o.orderedAt <= :end")
     List<Orders> findByOrderedAtBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
