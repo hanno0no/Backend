@@ -12,7 +12,6 @@ import hanno0no.hnn.repository.orders.OrdersRepository;
 import hanno0no.hnn.repository.state.StateRepository;
 import hanno0no.hnn.request.admin.OrderSearchRequest;
 import hanno0no.hnn.response.admin.AdminCheckResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,16 +41,10 @@ class AdminCheckServiceTest {
     LocalDateTime start = LocalDateTime.of(2026, 8, 1, 0, 0);
     LocalDateTime end = LocalDateTime.of(2026, 8, 31, 23, 59);
 
-    @BeforeEach
-    void openEvent() {
-        EventInfo event = new EventInfo();
-        event.setStartTime(start);
-        event.setEndTime(end);
-        when(eventInfoRepository.findByIsOpen()).thenReturn(Optional.of(event));
-    }
-
     @Test
     void filtersByMaterialAndTeamNumTogether() {
+        stubOpenEvent();
+
         OrderSearchRequest request = new OrderSearchRequest();
         request.setMaterial("PLA");
         request.setTeamNum("T2_1");
@@ -68,6 +61,7 @@ class AdminCheckServiceTest {
 
     @Test
     void filtersUnassignedAsNullAdmin() {
+        stubOpenEvent();
         OrderSearchRequest request = new OrderSearchRequest();
         request.setManager("unassigned");
 
@@ -78,6 +72,30 @@ class AdminCheckServiceTest {
 
         assertEquals(1, result.size());
         assertEquals("", result.get(0).getAdmin());
+    }
+
+    @Test
+    void statusFilterKeepsEventDateWindow() {
+        stubOpenEvent();
+        when(stateRepository.findStateIdByState("accepted")).thenReturn(Optional.of(2));
+
+        OrderSearchRequest request = new OrderSearchRequest();
+        request.setStatus("accepted");
+
+        when(ordersRepository.findByFilters(eq(2), isNull(), eq(false), isNull(), isNull(), eq(start), eq(end)))
+                .thenReturn(List.of(order(1, "a.stl", "T2_1", "PLA", "accepted")));
+
+        List<AdminCheckResponse> result = adminCheckService.getOrders(request);
+
+        assertEquals(1, result.size());
+        assertEquals("accepted", result.get(0).getState());
+    }
+
+    private void stubOpenEvent() {
+        EventInfo event = new EventInfo();
+        event.setStartTime(start);
+        event.setEndTime(end);
+        when(eventInfoRepository.findByIsOpen()).thenReturn(Optional.of(event));
     }
 
     private static Orders order(int id, String file, String teamNum, String materialName, String stateName) {

@@ -43,14 +43,6 @@ public class AdminCheckService {
 
     public List<AdminCheckResponse> getOrders(OrderSearchRequest orderSearchRequest) {
 
-        Optional<EventInfo> activeEvent = eventInfoRepository.findByIsOpen();
-        if (activeEvent.isEmpty()) {
-            return List.of();
-        }
-
-        LocalDateTime start = activeEvent.get().getStartTime();
-        LocalDateTime end = activeEvent.get().getEndTime();
-
         Integer stateId = null;
         if (StringUtils.hasText(orderSearchRequest.getStatus())) {
             stateId = stateRepository.findStateIdByState(orderSearchRequest.getStatus())
@@ -61,6 +53,13 @@ public class AdminCheckService {
         String manager = unassigned ? null : textOrNull(orderSearchRequest.getManager());
         String material = textOrNull(orderSearchRequest.getMaterial());
         String teamNum = textOrNull(orderSearchRequest.getTeamNum());
+
+        Optional<EventInfo> activeEvent = eventInfoRepository.findByIsOpen();
+        if (activeEvent.isEmpty()) {
+            return List.of();
+        }
+        LocalDateTime start = activeEvent.get().getStartTime();
+        LocalDateTime end = activeEvent.get().getEndTime();
 
         List<Orders> orders = ordersRepository.findByFilters(stateId, manager, unassigned, material, teamNum, start, end);
 
