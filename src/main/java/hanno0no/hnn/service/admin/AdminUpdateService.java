@@ -6,6 +6,7 @@ import hanno0no.hnn.domain.state.State;
 import hanno0no.hnn.repository.adminuser.AdminUserRepository;
 import hanno0no.hnn.repository.orders.OrdersRepository;
 import hanno0no.hnn.repository.state.StateRepository;
+import hanno0no.hnn.service.sse.SseEventService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ public class AdminUpdateService {
     private final OrdersRepository ordersRepository;
     private final StateRepository stateRepository;
     private final AdminUserRepository adminUserRepository;
+    private final SseEventService sseEventService;
 
     @Transactional
     public void updateOrderStatus(Integer orderId, String newStatus) {
@@ -27,6 +29,8 @@ public class AdminUpdateService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상태입니다: " + newStatus));
 
         order.setState(newState);
+        sseEventService.emit(SseEventService.INDEX_UPDATED);
+        sseEventService.emit(SseEventService.ORDERS_UPDATED);
     }
 
     @Transactional
@@ -36,6 +40,7 @@ public class AdminUpdateService {
 
         if (isUnassigned(newManagerName)) {
             order.setAdmin(null);
+            sseEventService.emit(SseEventService.ORDERS_UPDATED);
             return;
         }
 
@@ -43,6 +48,7 @@ public class AdminUpdateService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다: " + newManagerName));
 
         order.setAdmin(newManager);
+        sseEventService.emit(SseEventService.ORDERS_UPDATED);
     }
 
     @Transactional
@@ -52,6 +58,7 @@ public class AdminUpdateService {
 
         boolean hide = hidden == null || hidden;
         order.setHiddenFromDashboard(hide);
+        sseEventService.emit(SseEventService.INDEX_UPDATED);
     }
 
     private boolean isUnassigned(String managerName) {

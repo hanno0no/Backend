@@ -2,9 +2,11 @@ package hanno0no.hnn.service.admin;
 
 import hanno0no.hnn.domain.adminuser.AdminUser;
 import hanno0no.hnn.domain.orders.Orders;
+import hanno0no.hnn.domain.state.State;
 import hanno0no.hnn.repository.adminuser.AdminUserRepository;
 import hanno0no.hnn.repository.orders.OrdersRepository;
 import hanno0no.hnn.repository.state.StateRepository;
+import hanno0no.hnn.service.sse.SseEventService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,6 +27,7 @@ class AdminUpdateServiceTest {
     @Mock OrdersRepository ordersRepository;
     @Mock StateRepository stateRepository;
     @Mock AdminUserRepository adminUserRepository;
+    @Mock SseEventService sseEventService;
 
     @InjectMocks AdminUpdateService adminUpdateService;
 
@@ -52,5 +55,28 @@ class AdminUpdateServiceTest {
 
         assertNull(order.getAdmin());
         verifyNoInteractions(adminUserRepository);
+    }
+
+    @Test
+    void statusChangeEmitsIndexUpdated() {
+        Orders order = new Orders();
+        State accepted = new State();
+        accepted.setState("accepted");
+        when(ordersRepository.findById(1)).thenReturn(Optional.of(order));
+        when(stateRepository.findByState("accepted")).thenReturn(Optional.of(accepted));
+
+        adminUpdateService.updateOrderStatus(1, "accepted");
+
+        verify(sseEventService).emit(SseEventService.INDEX_UPDATED);
+    }
+
+    @Test
+    void hideEmitsIndexUpdated() {
+        Orders order = new Orders();
+        when(ordersRepository.findById(1)).thenReturn(Optional.of(order));
+
+        adminUpdateService.updateOrderHidden(1, true);
+
+        verify(sseEventService).emit(SseEventService.INDEX_UPDATED);
     }
 }

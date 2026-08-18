@@ -10,6 +10,7 @@ import hanno0no.hnn.request.admin.AdminSettingRequest;
 import hanno0no.hnn.request.admin.EventInfoRequestDto;
 import hanno0no.hnn.request.admin.MaterialRequestDto;
 import hanno0no.hnn.request.admin.MessageRequestDto;
+import hanno0no.hnn.service.sse.SseEventService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class AdminSettingUpdateService {
     private final EventInfoRepository eventInfoRepository;
     private final MessageRepository messageRepository;
     private final MaterialRepository materialRepository;
+    private final SseEventService sseEventService;
 
     @Transactional
     public void updateAllSettings(AdminSettingRequest request) {
@@ -70,5 +72,8 @@ public class AdminSettingUpdateService {
                 if (dto.getIsEmergency() != null) entity.setEmergency(dto.getIsEmergency());
             }
         }
+
+        sseEventService.emit(SseEventService.INDEX_UPDATED);
+        sseEventService.emit(SseEventService.SETTINGS_UPDATED);
     }
 }

@@ -55,6 +55,7 @@ public class SecurityConfig {
                                 "/hnn/admin/login",
                                 "/hnn/admin/signup",
                                 "/hnn/index",
+                                "/hnn/events",
                                 "/hnn/checkStatus",
                                 "/hnn/register",
                                 "/hnn/register/getmaterial",

@@ -12,6 +12,7 @@ import hanno0no.hnn.repository.orders.OrdersRepository;
 import hanno0no.hnn.repository.state.StateRepository;
 import hanno0no.hnn.repository.team.TeamRepository;
 import hanno0no.hnn.request.register.RegisterRequest;
+import hanno0no.hnn.service.sse.SseEventService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class RegisterService {
     private final MaterialRepository materialRepository;
     private final StateRepository stateRepository;
     private final AdminUserRepository adminUserRepository;
+    private final SseEventService sseEventService;
 
     @Transactional // ✨ 데이터를 DB에 쓰는 작업은 반드시 @Transactional을 붙여야 합니다.
     public int createOrder(RegisterRequest requestDto) {
@@ -57,6 +59,7 @@ public class RegisterService {
 
         savedOrder.setFileName(fileName);
 
+        sseEventService.emit(SseEventService.ORDERS_UPDATED);
         return savedOrder.getOrderId();
 
     }

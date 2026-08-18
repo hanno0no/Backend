@@ -3,6 +3,7 @@ package hanno0no.hnn.service.admin;
 import hanno0no.hnn.repository.eventinfo.EventInfoRepository;
 import hanno0no.hnn.repository.material.MaterialRepository;
 import hanno0no.hnn.repository.message.MessageRepository;
+import hanno0no.hnn.service.sse.SseEventService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ public class DeleteSettingService {
     private final EventInfoRepository eventInfoRepository;
     private final MessageRepository messageRepository;
     private final MaterialRepository materialRepository;
+    private final SseEventService sseEventService;
 
     @Transactional
     public void deleteEventInfo(Integer eventId) {
@@ -22,6 +24,8 @@ public class DeleteSettingService {
             throw new IllegalArgumentException("삭제하려는 이벤트 정보를 찾을 수 없습니다. ID: " + eventId);
         }
         eventInfoRepository.deleteById(eventId);
+        sseEventService.emit(SseEventService.INDEX_UPDATED);
+        sseEventService.emit(SseEventService.SETTINGS_UPDATED);
     }
 
     @Transactional
@@ -30,6 +34,8 @@ public class DeleteSettingService {
             throw new IllegalArgumentException("삭제하려는 메시지를 찾을 수 없습니다. ID: " + messageId);
         }
         messageRepository.deleteById(messageId);
+        sseEventService.emit(SseEventService.INDEX_UPDATED);
+        sseEventService.emit(SseEventService.SETTINGS_UPDATED);
     }
 
     @Transactional
@@ -41,5 +47,6 @@ public class DeleteSettingService {
             throw new IllegalArgumentException("삭제하려는 재질 정보를 찾을 수 없습니다. ID: " + materialId);
         }
         materialRepository.deleteById(materialId);
+        sseEventService.emit(SseEventService.SETTINGS_UPDATED);
     }
 }

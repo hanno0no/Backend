@@ -10,6 +10,7 @@ import hanno0no.hnn.repository.message.MessageRepository;
 import hanno0no.hnn.request.admin.EventInfoCreateRequest;
 import hanno0no.hnn.request.admin.MaterialCreateRequest;
 import hanno0no.hnn.request.admin.MessageCreateRequest;
+import hanno0no.hnn.service.sse.SseEventService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class CreateSettingService {
     private final EventInfoRepository eventInfoRepository;
     private final MessageRepository messageRepository;
     private final MaterialRepository materialRepository;
+    private final SseEventService sseEventService;
 
     @Transactional
     public String createMaterial(MaterialCreateRequest request) {
@@ -35,7 +37,7 @@ public class CreateSettingService {
         material.setActive(request.isActive());
 
         Material savedMaterial = materialRepository.save(material);
-
+        sseEventService.emit(SseEventService.SETTINGS_UPDATED);
         return savedMaterial.getMaterialName();
     }
 
@@ -56,6 +58,8 @@ public class CreateSettingService {
         eventInfo.setWaitingLimit(12);
 
         EventInfo savedEventInfo = eventInfoRepository.save(eventInfo);
+        sseEventService.emit(SseEventService.INDEX_UPDATED);
+        sseEventService.emit(SseEventService.SETTINGS_UPDATED);
         return savedEventInfo.getEventName();
 
     }
@@ -70,6 +74,8 @@ public class CreateSettingService {
         message.setEmergency(request.isEmergency());
 
         Message savedMessage = messageRepository.save(message);
+        sseEventService.emit(SseEventService.INDEX_UPDATED);
+        sseEventService.emit(SseEventService.SETTINGS_UPDATED);
         return savedMessage.getMessageId();
 
     }
