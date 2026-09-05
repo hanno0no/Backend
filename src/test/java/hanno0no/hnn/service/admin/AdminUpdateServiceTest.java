@@ -58,7 +58,7 @@ class AdminUpdateServiceTest {
     }
 
     @Test
-    void statusChangeEmitsIndexUpdated() {
+    void statusChangeEmitsIndexAndOrdersUpdated() {
         Orders order = new Orders();
         State accepted = new State();
         accepted.setState("accepted");
@@ -68,6 +68,17 @@ class AdminUpdateServiceTest {
         adminUpdateService.updateOrderStatus(1, "accepted");
 
         verify(sseEventService).emit(SseEventService.INDEX_UPDATED);
+        verify(sseEventService).emit(SseEventService.ORDERS_UPDATED);
+    }
+
+    @Test
+    void managerChangeEmitsOrdersUpdated() {
+        Orders order = new Orders();
+        when(ordersRepository.findById(1)).thenReturn(Optional.of(order));
+
+        adminUpdateService.updateOrderManager(1, null);
+
+        verify(sseEventService).emit(SseEventService.ORDERS_UPDATED);
     }
 
     @Test
