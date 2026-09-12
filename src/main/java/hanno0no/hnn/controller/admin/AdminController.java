@@ -59,7 +59,7 @@ public class AdminController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<Map<String, Long>> getStats() {
+    public ResponseEntity<Map<String, Object>> getStats() {
         return ResponseEntity.ok(adminStatsService.getStats());
     }
 
