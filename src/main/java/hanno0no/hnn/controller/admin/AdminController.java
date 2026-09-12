@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 //@CrossOrigin(origins = "*")
 @RestController
@@ -32,6 +33,7 @@ public class AdminController {
     private final AdminSettingUpdateService adminSettingUpdateService;
     private final CreateSettingService createSettingService;
     private final DeleteSettingService deleteSettingService;
+    private final AdminStatsService adminStatsService;
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request) {
@@ -54,6 +56,11 @@ public class AdminController {
         List<AdminCheckResponse> responses = adminCheckService.getOrders(orderSearchRequest);
 
         return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Long>> getStats() {
+        return ResponseEntity.ok(adminStatsService.getStats());
     }
 
     @PatchMapping("/{orderId}/status")

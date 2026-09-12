@@ -91,4 +91,9 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
 
     @Query("SELECT o FROM Orders o WHERE o.state.stateId NOT IN :stateNums ORDER BY o.orderedAt ASC")
     List<Orders> findOldestOngoingOrders(@Param("stateNums") List<Integer> stateNums, Pageable pageable);
+
+    @Query("SELECT COUNT(o) FROM Orders o WHERE o.state.stateId = :stateId AND o.orderedAt >= :start AND o.orderedAt <= :end")
+    long countByStateIdAndOrderedAtBetween(@Param("stateId") Integer stateId,
+                                           @Param("start") LocalDateTime start,
+                                           @Param("end") LocalDateTime end);
 }
