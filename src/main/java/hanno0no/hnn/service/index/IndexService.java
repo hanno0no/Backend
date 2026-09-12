@@ -56,10 +56,11 @@ public class IndexService {
         List<Orders> completeTeams = ordersRepository.findTopCompletedOrders(
                 completeStateId, start, end, PageRequest.of(0, completedLimit));
 
+        // findTopCompletedOrders가 이미 updatedAt DESC로 정렬해 반환하므로
+        // 가장 최근에 완료된 팀이 배열 맨 앞에 오도록 별도로 뒤집지 않는다.
         List<String> completeTeamNum = completeTeams.stream()
                 .map(order -> order.getTeam().getTeamNum() + "_" + order.getOrderId())
                 .collect(Collectors.toList());
-        Collections.reverse(completeTeamNum);
 
         List<Integer> waitingStateIds = Arrays.asList(acceptedStateId, designCompleteStateId);
         List<Orders> ongoingTeams = ordersRepository.findOldestWaitingOrders(

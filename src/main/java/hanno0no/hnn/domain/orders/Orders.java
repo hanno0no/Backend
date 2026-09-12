@@ -7,6 +7,7 @@ import hanno0no.hnn.domain.team.Team;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -27,6 +28,7 @@ public class Orders {
     @Column(name = "ordered_at", insertable = false, updatable = false)
     private LocalDateTime orderedAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
