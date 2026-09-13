@@ -5,6 +5,7 @@ import hanno0no.hnn.request.admin.*;
 import hanno0no.hnn.response.admin.AdminCheckResponse;
 import hanno0no.hnn.response.admin.AdminLoginResponse;
 import hanno0no.hnn.response.admin.AdminSettingResponse;
+import hanno0no.hnn.response.admin.TeamResponse;
 import hanno0no.hnn.service.admin.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class AdminController {
     private final CreateSettingService createSettingService;
     private final DeleteSettingService deleteSettingService;
     private final AdminStatsService adminStatsService;
+    private final TeamService teamService;
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request) {
@@ -98,6 +100,29 @@ public class AdminController {
     ) {
         Boolean hidden = request == null ? Boolean.TRUE : request.getHidden();
         adminUpdateService.updateOrderHidden(orderId, hidden);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/teams")
+    public ResponseEntity<List<TeamResponse>> getTeams() {
+        return ResponseEntity.ok(teamService.getTeams());
+    }
+
+    @PostMapping("/teams")
+    public ResponseEntity<Void> createTeam(@RequestBody TeamCreateRequest request) {
+        teamService.createTeam(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/teams/{teamNum}")
+    public ResponseEntity<Void> updateTeam(@PathVariable String teamNum, @RequestBody TeamUpdateRequest request) {
+        teamService.updateTeam(teamNum, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/teams/{teamNum}")
+    public ResponseEntity<Void> deleteTeam(@PathVariable String teamNum) {
+        teamService.deleteTeam(teamNum);
         return ResponseEntity.ok().build();
     }
 
