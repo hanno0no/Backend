@@ -82,6 +82,15 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/{orderId}/material")
+    public ResponseEntity<Void> updateOrderMaterial(
+            @PathVariable Integer orderId,
+            @RequestBody OrderMaterialUpdateRequest request
+    ) {
+        adminUpdateService.updateOrderMaterial(orderId, request.getMaterial());
+        return ResponseEntity.ok().build();
+    }
+
     @PatchMapping("/{orderId}/hide")
     public ResponseEntity<Void> hideOrder(
             @PathVariable Integer orderId,

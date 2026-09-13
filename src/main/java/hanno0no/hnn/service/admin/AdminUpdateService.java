@@ -1,9 +1,11 @@
 package hanno0no.hnn.service.admin;
 
 import hanno0no.hnn.domain.adminuser.AdminUser;
+import hanno0no.hnn.domain.material.Material;
 import hanno0no.hnn.domain.orders.Orders;
 import hanno0no.hnn.domain.state.State;
 import hanno0no.hnn.repository.adminuser.AdminUserRepository;
+import hanno0no.hnn.repository.material.MaterialRepository;
 import hanno0no.hnn.repository.orders.OrdersRepository;
 import hanno0no.hnn.repository.state.StateRepository;
 import hanno0no.hnn.service.sse.SseEventService;
@@ -18,6 +20,7 @@ public class AdminUpdateService {
     private final OrdersRepository ordersRepository;
     private final StateRepository stateRepository;
     private final AdminUserRepository adminUserRepository;
+    private final MaterialRepository materialRepository;
     private final SseEventService sseEventService;
 
     @Transactional
@@ -48,6 +51,18 @@ public class AdminUpdateService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다: " + newManagerName));
 
         order.setAdmin(newManager);
+        sseEventService.emit(SseEventService.ORDERS_UPDATED);
+    }
+
+    @Transactional
+    public void updateOrderMaterial(Integer orderId, String newMaterialName) {
+        Orders order = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다. ID: " + orderId));
+
+        Material newMaterial = materialRepository.findByMaterialName(newMaterialName)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 재질입니다: " + newMaterialName));
+
+        order.setMaterial(newMaterial);
         sseEventService.emit(SseEventService.ORDERS_UPDATED);
     }
 
