@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -24,6 +26,11 @@ public class AdminUser implements UserDetails {
 
     private String password_hash;
     private String role;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "admin_work_area", joinColumns = @JoinColumn(name = "admin_id"))
+    @Column(name = "work_area")
+    private Set<String> workAreas = new HashSet<>();
 
     public AdminUser() {}  // 기본 생성자
 
@@ -55,6 +62,12 @@ public class AdminUser implements UserDetails {
         this.role = role;
     }
 
+    public Set<String> getWorkAreas() {
+        return workAreas;
+    }
+    public void setWorkAreas(Set<String> workAreas) {
+        this.workAreas = workAreas;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
