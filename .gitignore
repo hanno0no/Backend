@@ -39,3 +39,6 @@ out/
 
 # application 설정 파일 무시
 src/main/resources/application.properties
+
+# git worktrees (SDD 작업 공간)
+.worktrees/
