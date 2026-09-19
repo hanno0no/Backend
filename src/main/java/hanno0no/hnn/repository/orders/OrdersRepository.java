@@ -45,11 +45,11 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
 
     @Query("SELECT o FROM Orders o LEFT JOIN o.admin a WHERE (:start IS NULL OR o.orderedAt >= :start)"
             + " AND (:end IS NULL OR o.orderedAt <= :end)"
-            + " AND (:stateId IS NULL OR o.state.stateId = :stateId)"
+            + " AND (:stateIds IS NULL OR o.state.stateId IN :stateIds)"
             + " AND ((:unassigned = true AND a IS NULL) OR (:unassigned = false AND (:username IS NULL OR a.userName = :username)))"
             + " AND (:material IS NULL OR o.material.materialName = :material)"
             + " AND (:teamNum IS NULL OR o.team.teamNum = :teamNum)")
-    List<Orders> findByFilters(@Param("stateId") Integer stateId,
+    List<Orders> findByFilters(@Param("stateIds") List<Integer> stateIds,
                                @Param("username") String username,
                                @Param("unassigned") boolean unassigned,
                                @Param("material") String material,

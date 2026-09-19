@@ -43,10 +43,15 @@ public class AdminCheckService {
 
     public List<AdminCheckResponse> getOrders(OrderSearchRequest orderSearchRequest) {
 
-        Integer stateId = null;
-        if (StringUtils.hasText(orderSearchRequest.getStatus())) {
-            stateId = stateRepository.findStateIdByState(orderSearchRequest.getStatus())
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상태(status) 이름입니다: " + orderSearchRequest.getStatus()));
+        List<Integer> stateIds = null;
+        if (orderSearchRequest.getStatus() != null && !orderSearchRequest.getStatus().isEmpty()) {
+            stateIds = new ArrayList<>();
+            for (String statusName : orderSearchRequest.getStatus()) {
+                if (!StringUtils.hasText(statusName)) continue;
+                Integer stateId = stateRepository.findStateIdByState(statusName)
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상태(status) 이름입니다: " + statusName));
+                stateIds.add(stateId);
+            }
         }
 
         boolean unassigned = "unassigned".equals(orderSearchRequest.getManager());
@@ -61,7 +66,7 @@ public class AdminCheckService {
         LocalDateTime start = activeEvent.get().getStartTime();
         LocalDateTime end = activeEvent.get().getEndTime();
 
-        List<Orders> orders = ordersRepository.findByFilters(stateId, manager, unassigned, material, teamNum, start, end);
+        List<Orders> orders = ordersRepository.findByFilters(stateIds, manager, unassigned, material, teamNum, start, end);
 
 
         if (orders.isEmpty()) {

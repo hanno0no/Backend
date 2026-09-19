@@ -80,15 +80,35 @@ class AdminCheckServiceTest {
         when(stateRepository.findStateIdByState("accepted")).thenReturn(Optional.of(2));
 
         OrderSearchRequest request = new OrderSearchRequest();
-        request.setStatus("accepted");
+        request.setStatus(List.of("accepted"));
 
-        when(ordersRepository.findByFilters(eq(2), isNull(), eq(false), isNull(), isNull(), eq(start), eq(end)))
+        when(ordersRepository.findByFilters(eq(List.of(2)), isNull(), eq(false), isNull(), isNull(), eq(start), eq(end)))
                 .thenReturn(List.of(order(1, "a.stl", "T2_1", "PLA", "accepted")));
 
         List<AdminCheckResponse> result = adminCheckService.getOrders(request);
 
         assertEquals(1, result.size());
         assertEquals("accepted", result.get(0).getState());
+    }
+
+    @Test
+    void statusFilterAcceptsMultipleStatuses() {
+        stubOpenEvent();
+        when(stateRepository.findStateIdByState("accepted")).thenReturn(Optional.of(2));
+        when(stateRepository.findStateIdByState("design_complete")).thenReturn(Optional.of(3));
+
+        OrderSearchRequest request = new OrderSearchRequest();
+        request.setStatus(List.of("accepted", "design_complete"));
+
+        when(ordersRepository.findByFilters(eq(List.of(2, 3)), isNull(), eq(false), isNull(), isNull(), eq(start), eq(end)))
+                .thenReturn(List.of(
+                        order(1, "a.stl", "T2_1", "PLA", "accepted"),
+                        order(2, "b.stl", "T2_2", "PLA", "design_complete")
+                ));
+
+        List<AdminCheckResponse> result = adminCheckService.getOrders(request);
+
+        assertEquals(2, result.size());
     }
 
     private void stubOpenEvent() {
