@@ -23,6 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("New-Access-Token"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 

@@ -19,6 +19,8 @@ spring:
       validation-timeout: 3000
 
 jwt:
-  # JWT_EXPIRATION_TIME 미설정 시 기본 12시간 (밀리초)
+  # JWT_EXPIRATION_TIME 미설정 시 기본 1시간 (밀리초). application.properties와 값 통일.
+  # 실제 만료는 JwtAuthenticationFilter가 매 요청마다 토큰을 재발급(슬라이딩)하므로,
+  # 이 값은 "마지막 활동으로부터의" 만료 시간을 의미함.
   secret: ${JWT_SECRET_KEY}
-  expiration: ${JWT_EXPIRATION_TIME:43200000}
+  expiration: ${JWT_EXPIRATION_TIME:3600000}

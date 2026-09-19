@@ -47,6 +47,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             userDetails, null, userDetails.getAuthorities()
                     );
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                    // 활동(=인증된 요청)마다 만료 시간을 연장한 토큰을 재발급.
+                    // "마지막 활동으로부터 N시간" 방식의 슬라이딩 만료를 구현하기 위함.
+                    response.setHeader("New-Access-Token", jwtUtil.generateToken(username));
                 }
             }
         } catch (JwtException | IllegalArgumentException | UsernameNotFoundException e) {
