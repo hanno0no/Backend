@@ -86,6 +86,15 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/admins/{id}")
+    public ResponseEntity<Void> deleteAdmin(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal AdminUser currentAdmin
+    ) {
+        adminManagementService.deleteAdmin(id, currentAdmin);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getStats() {
         return ResponseEntity.ok(adminStatsService.getStats());

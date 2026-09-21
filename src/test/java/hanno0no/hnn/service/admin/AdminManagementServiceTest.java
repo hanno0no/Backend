@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -124,5 +126,45 @@ class AdminManagementServiceTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> adminManagementService.updateAdmin(1, request, me));
+    }
+
+    @Test
+    void cannotDeleteOwnAccount() {
+        // self-check가 count() 조회보다 먼저 실행되므로 count()는 stub하지 않는다
+        // (stub해두면 호출되지 않아 MockitoExtension의 strict-stubs 검증에서 실패한다).
+        AdminUser me = new AdminUser();
+        me.setAdminId(1);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> adminManagementService.deleteAdmin(1, me));
+
+        verify(adminUserRepository, never()).delete(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void cannotDeleteLastRemainingAdmin() {
+        // target(2)이 본인(1)과 달라야 self-check를 통과해서 last-admin 체크까지 도달한다.
+        AdminUser me = new AdminUser();
+        me.setAdminId(1);
+        when(adminUserRepository.count()).thenReturn(1L);
+
+        assertThrows(IllegalStateException.class,
+                () -> adminManagementService.deleteAdmin(2, me));
+    }
+
+    @Test
+    void deletesOtherAdminSuccessfully() {
+        AdminUser me = new AdminUser();
+        me.setAdminId(1);
+
+        AdminUser target = new AdminUser();
+        target.setAdminId(2);
+
+        when(adminUserRepository.count()).thenReturn(2L);
+        when(adminUserRepository.findById(2)).thenReturn(Optional.of(target));
+
+        adminManagementService.deleteAdmin(2, me);
+
+        verify(adminUserRepository).delete(target);
     }
 }

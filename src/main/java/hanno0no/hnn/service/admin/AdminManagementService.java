@@ -59,4 +59,17 @@ public class AdminManagementService {
             target.setWorkAreas(new HashSet<>(request.getWorkAreas()));
         }
     }
+
+    @Transactional
+    public void deleteAdmin(int targetAdminId, AdminUser currentAdmin) {
+        if (targetAdminId == currentAdmin.getAdminId()) {
+            throw new IllegalArgumentException("본인 계정은 삭제할 수 없습니다.");
+        }
+        if (adminUserRepository.count() <= 1) {
+            throw new IllegalStateException("마지막 남은 관리자 계정은 삭제할 수 없습니다.");
+        }
+        AdminUser target = adminUserRepository.findById(targetAdminId)
+                .orElseThrow(() -> new IllegalArgumentException("관리자를 찾을 수 없습니다: " + targetAdminId));
+        adminUserRepository.delete(target);
+    }
 }
