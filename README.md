@@ -36,6 +36,7 @@
 | GET | `/hnn/register/getstate` | 상태 코드 목록 |
 | GET | `/hnn/register/getadminname` | 담당자(관리자) 이름 목록 |
 | GET | `/hnn/checkStatus?teamNum=` | 팀명으로 본인 주문 진행 상황 조회 |
+| POST | `/hnn/admin/setup-password` | 최초 비밀번호 설정 (비밀번호 미설정 계정만) |
 
 ### 관리자 (JWT 필요)
 
@@ -43,6 +44,10 @@
 |---|---|---|
 | POST | `/hnn/admin/login` | 로그인, JWT 발급 |
 | POST | `/hnn/admin/signup` | 관리자 계정 생성 |
+| GET | `/hnn/admin/admins` | 관리자 계정 목록 조회 |
+| PATCH | `/hnn/admin/admins/{id}` | 관리자 계정 수정 (비밀번호 변경은 본인만) |
+| DELETE | `/hnn/admin/admins/{id}` | 관리자 계정 삭제 (본인/마지막 계정 삭제 불가) |
+| GET / POST / PATCH / DELETE | `/hnn/admin/teams` (`/{teamNum}`) | 팀 관리 |
 | GET | `/hnn/admin/view` | 주문 목록 조회 (상태·담당자·재질·팀 필터) |
 | PATCH | `/hnn/admin/{orderId}/status` | 주문 상태 변경 |
 | PATCH | `/hnn/admin/{orderId}/manager` | 담당자 배정/해제 |
