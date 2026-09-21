@@ -53,7 +53,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/hnn/admin/login",
-                                "/hnn/admin/signup",
                                 "/hnn/index",
                                 "/hnn/events",
                                 "/hnn/checkStatus",
