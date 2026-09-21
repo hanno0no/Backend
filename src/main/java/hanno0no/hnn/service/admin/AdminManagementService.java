@@ -14,10 +14,13 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AdminManagementService {
+
+    private static final Set<String> ALLOWED_WORK_AREAS = Set.of("접수", "디자인", "출력", "기타");
 
     private final AdminUserRepository adminUserRepository;
     private final PasswordEncoder passwordEncoder;
@@ -56,6 +59,11 @@ public class AdminManagementService {
         }
 
         if (request.getWorkAreas() != null) {
+            for (String area : request.getWorkAreas()) {
+                if (!ALLOWED_WORK_AREAS.contains(area)) {
+                    throw new IllegalArgumentException("허용되지 않는 업무 담당 영역입니다: " + area);
+                }
+            }
             target.setWorkAreas(new HashSet<>(request.getWorkAreas()));
         }
     }

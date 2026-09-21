@@ -113,6 +113,25 @@ class AdminManagementServiceTest {
     }
 
     @Test
+    void invalidWorkAreaThrowsOnUpdate() {
+        AdminUser me = new AdminUser();
+        me.setAdminId(1);
+        me.setUserName("한수민");
+
+        AdminUser target = new AdminUser();
+        target.setAdminId(2);
+        target.setUserName("김근희");
+        target.setWorkAreas(Set.of());
+        when(adminUserRepository.findById(2)).thenReturn(Optional.of(target));
+
+        AdminUserUpdateRequest request = new AdminUserUpdateRequest();
+        request.setWorkAreas(List.of("잘못된영역"));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> adminManagementService.updateAdmin(2, request, me));
+    }
+
+    @Test
     void updatingToExistingUserNameThrows() {
         AdminUser me = new AdminUser();
         me.setAdminId(1);

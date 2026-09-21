@@ -58,4 +58,25 @@ class AdminCreateServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> adminCreateService.createAdmin(request));
     }
+
+    @Test
+    void blankUserNameThrows() {
+        AdminCreateRequest request = new AdminCreateRequest();
+        request.setUserName("   ");
+
+        assertThrows(IllegalArgumentException.class, () -> adminCreateService.createAdmin(request));
+
+        verify(adminUserRepository, org.mockito.Mockito.never()).existsByUserName(org.mockito.ArgumentMatchers.anyString());
+    }
+
+    @Test
+    void invalidWorkAreaThrowsOnCreate() {
+        AdminCreateRequest request = new AdminCreateRequest();
+        request.setUserName("newadmin");
+        request.setWorkAreas(List.of("디자인", "잘못된영역"));
+
+        when(adminUserRepository.existsByUserName("newadmin")).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> adminCreateService.createAdmin(request));
+    }
 }
