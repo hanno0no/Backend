@@ -20,7 +20,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AdminManagementService {
 
-    private static final Set<String> ALLOWED_WORK_AREAS = Set.of("접수", "디자인", "출력", "기타");
+    private static final Set<String> ALLOWED_WORK_AREAS = Set.of("접수", "디자인", "출력", "3D프린트", "기타");
 
     private final AdminUserRepository adminUserRepository;
     private final PasswordEncoder passwordEncoder;
