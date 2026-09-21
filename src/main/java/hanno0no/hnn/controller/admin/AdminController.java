@@ -1,6 +1,7 @@
 package hanno0no.hnn.controller.admin;
 
 
+import hanno0no.hnn.domain.adminuser.AdminUser;
 import hanno0no.hnn.request.admin.*;
 import hanno0no.hnn.response.admin.AdminCheckResponse;
 import hanno0no.hnn.response.admin.AdminLoginResponse;
@@ -11,6 +12,7 @@ import hanno0no.hnn.service.admin.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import hanno0no.hnn.service.admin.DeleteSettingService;
@@ -72,6 +74,16 @@ public class AdminController {
     @GetMapping("/admins")
     public ResponseEntity<List<AdminUserResponse>> getAdmins() {
         return ResponseEntity.ok(adminManagementService.getAdmins());
+    }
+
+    @PatchMapping("/admins/{id}")
+    public ResponseEntity<Void> updateAdmin(
+            @PathVariable Integer id,
+            @RequestBody AdminUserUpdateRequest request,
+            @AuthenticationPrincipal AdminUser currentAdmin
+    ) {
+        adminManagementService.updateAdmin(id, request, currentAdmin);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/stats")
