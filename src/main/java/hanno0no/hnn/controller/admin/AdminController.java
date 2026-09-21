@@ -5,6 +5,7 @@ import hanno0no.hnn.request.admin.*;
 import hanno0no.hnn.response.admin.AdminCheckResponse;
 import hanno0no.hnn.response.admin.AdminLoginResponse;
 import hanno0no.hnn.response.admin.AdminSettingResponse;
+import hanno0no.hnn.response.admin.AdminUserResponse;
 import hanno0no.hnn.response.admin.TeamResponse;
 import hanno0no.hnn.service.admin.*;
 import lombok.Getter;
@@ -37,6 +38,7 @@ public class AdminController {
     private final AdminStatsService adminStatsService;
     private final TeamService teamService;
     private final AdminSetupPasswordService adminSetupPasswordService;
+    private final AdminManagementService adminManagementService;
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request) {
@@ -65,6 +67,11 @@ public class AdminController {
         List<AdminCheckResponse> responses = adminCheckService.getOrders(orderSearchRequest);
 
         return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/admins")
+    public ResponseEntity<List<AdminUserResponse>> getAdmins() {
+        return ResponseEntity.ok(adminManagementService.getAdmins());
     }
 
     @GetMapping("/stats")
