@@ -1,6 +1,7 @@
 package hanno0no.hnn.service.admin;
 
 import hanno0no.hnn.domain.adminuser.AdminUser;
+import hanno0no.hnn.exception.PasswordNotSetException;
 import hanno0no.hnn.exception.UnauthorizedException;
 import hanno0no.hnn.repository.adminuser.AdminUserRepository;
 import hanno0no.hnn.request.admin.AdminLoginRequest;
@@ -20,6 +21,10 @@ public class AdminLoginService {
     public String login(AdminLoginRequest request) {
         AdminUser adminUser = adminUserRepository.findByUserName(request.getUsername())
                 .orElseThrow(() -> new UnauthorizedException("아이디 또는 비밀번호가 일치하지 않습니다."));
+
+        if (adminUser.getPassword_hash() == null) {
+            throw new PasswordNotSetException("최초 로그인입니다. 비밀번호를 먼저 설정해주세요.");
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), adminUser.getPassword_hash())) {
             throw new UnauthorizedException("아이디 또는 비밀번호가 일치하지 않습니다.");
