@@ -36,10 +36,17 @@ public class AdminController {
     private final DeleteSettingService deleteSettingService;
     private final AdminStatsService adminStatsService;
     private final TeamService teamService;
+    private final AdminSetupPasswordService adminSetupPasswordService;
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request) {
         String token = adminLoginService.login(request);
+        return ResponseEntity.ok(new AdminLoginResponse(token));
+    }
+
+    @PostMapping("/setup-password")
+    public ResponseEntity<AdminLoginResponse> setupPassword(@RequestBody AdminSetupPasswordRequest request) {
+        String token = adminSetupPasswordService.setupPassword(request);
         return ResponseEntity.ok(new AdminLoginResponse(token));
     }
 
