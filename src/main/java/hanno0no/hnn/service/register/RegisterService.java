@@ -64,7 +64,7 @@ public class RegisterService {
 
     }
 
-    private String getMaterialCode(String materialName) {
+    public static String getMaterialCode(String materialName) {
         // 1. 안전한 비교를 위해, 입력받은 materialName이 null인지 먼저 확인합니다.
         if (materialName == null) {
             return "";

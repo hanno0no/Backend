@@ -8,6 +8,7 @@ import hanno0no.hnn.repository.adminuser.AdminUserRepository;
 import hanno0no.hnn.repository.material.MaterialRepository;
 import hanno0no.hnn.repository.orders.OrdersRepository;
 import hanno0no.hnn.repository.state.StateRepository;
+import hanno0no.hnn.service.register.RegisterService;
 import hanno0no.hnn.service.sse.SseEventService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,30 @@ public class AdminUpdateService {
         Material newMaterial = materialRepository.findByMaterialName(newMaterialName)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 재질입니다: " + newMaterialName));
 
-        order.setMaterial(newMaterial);
+        if (order.getMaterial().getMaterialNum() == newMaterial.getMaterialNum()) {
+            return; // 재질이 그대로면 아무 것도 하지 않는다
+        }
+
+        // 재질이 바뀌면 레이저 컷팅기 설정(속도/강도)이 달라지므로, 기존 건은 실패 처리하고
+        // 새 재질로 접수완료(디자인 진행 전) 상태의 주문을 새로 만든다. 담당자는 그대로 이어받는다.
+        State acceptedState = stateRepository.findByState("accepted")
+                .orElseThrow(() -> new IllegalStateException("accepted 상태를 찾을 수 없습니다."));
+        State failedState = stateRepository.findByState("failed")
+                .orElseThrow(() -> new IllegalStateException("failed 상태를 찾을 수 없습니다."));
+
+        Orders newOrder = new Orders();
+        newOrder.setTeam(order.getTeam());
+        newOrder.setMaterial(newMaterial);
+        newOrder.setState(acceptedState);
+        newOrder.setAdmin(order.getAdmin());
+        Orders savedNewOrder = ordersRepository.save(newOrder);
+
+        String materialCode = RegisterService.getMaterialCode(newMaterial.getMaterialName());
+        savedNewOrder.setFileName(String.format("%s_%d%s",
+                savedNewOrder.getTeam().getTeamNum(), savedNewOrder.getOrderId(), materialCode));
+
+        order.setState(failedState);
+
         sseEventService.emit(SseEventService.ORDERS_UPDATED);
     }
 
