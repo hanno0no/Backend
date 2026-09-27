@@ -99,7 +99,9 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
                                            @Param("end") LocalDateTime end);
 
     // 관리자 삭제(비활성화) 시, 완료/실패(종결) 상태가 아닌 주문만 담당자를 미배정으로 되돌린다.
-    @Modifying(clearAutomatically = true)
+    // clearAutomatically는 쓰지 않는다 - AdminManagementService.deleteAdmin()에서 이미 조회해둔
+    // AdminUser(target) 엔티티가 detach되어, 뒤이은 target.setDeletedAt() 변경이 DB에 반영되지 않는 버그가 있었음.
+    @Modifying
     @Query("UPDATE Orders o SET o.admin = NULL WHERE o.admin.adminId = :adminId AND o.state.stateId NOT IN :terminalStateIds")
     int unassignNonTerminalOrdersForAdmin(@Param("adminId") int adminId,
                                           @Param("terminalStateIds") List<Integer> terminalStateIds);
