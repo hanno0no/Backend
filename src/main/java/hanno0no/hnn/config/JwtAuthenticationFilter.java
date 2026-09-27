@@ -37,12 +37,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String token = authHeader.substring(7);
-            String username = jwtUtil.getUsernameFromToken(token);
+            int adminId = jwtUtil.getAdminIdFromToken(token);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = this.adminUserDetailsService.loadUserByUsername(username);
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.adminUserDetailsService.loadUserByAdminId(adminId);
 
-                if (jwtUtil.validateToken(token, userDetails.getUsername())) {
+                if (jwtUtil.validateToken(token, adminId)) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities()
                     );
@@ -50,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     // 활동(=인증된 요청)마다 만료 시간을 연장한 토큰을 재발급.
                     // "마지막 활동으로부터 N시간" 방식의 슬라이딩 만료를 구현하기 위함.
-                    response.setHeader("New-Access-Token", jwtUtil.generateToken(username));
+                    response.setHeader("New-Access-Token", jwtUtil.generateToken(adminId));
                 }
             }
         } catch (JwtException | IllegalArgumentException | UsernameNotFoundException e) {

@@ -22,6 +22,10 @@ public class AdminLoginService {
         AdminUser adminUser = adminUserRepository.findByUserName(request.getUsername())
                 .orElseThrow(() -> new UnauthorizedException("아이디 또는 비밀번호가 일치하지 않습니다."));
 
+        if (adminUser.getDeletedAt() != null) {
+            throw new UnauthorizedException("아이디 또는 비밀번호가 일치하지 않습니다.");
+        }
+
         if (adminUser.getPassword_hash() == null) {
             throw new PasswordNotSetException("최초 로그인입니다. 비밀번호를 먼저 설정해주세요.");
         }
@@ -30,6 +34,6 @@ public class AdminLoginService {
             throw new UnauthorizedException("아이디 또는 비밀번호가 일치하지 않습니다.");
         }
 
-        return jwtUtil.generateToken(adminUser.getUserName());
+        return jwtUtil.generateToken(adminUser.getAdminId());
     }
 }

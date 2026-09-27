@@ -15,5 +15,8 @@ public interface AdminUserRepository extends JpaRepository<AdminUser, Integer> {
 
     List<AdminUser> findByRole(String role);        // 특정 역할을 가진 관리자 리스트
 
+    Optional<AdminUser> findByAdminIdAndDeletedAtIsNull(int adminId);  // 삭제되지 않은 관리자만 id로 조회 (JWT 인증용)
+
+    long countByDeletedAtIsNull();   // 활성 상태인 관리자 수 (마지막 관리자 삭제 방지용)
 
 }

@@ -6,6 +6,7 @@ import hanno0no.hnn.domain.orders.Orders;
 import hanno0no.hnn.domain.state.State;
 import hanno0no.hnn.domain.team.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -96,4 +97,10 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
     long countByStateIdAndOrderedAtBetween(@Param("stateId") Integer stateId,
                                            @Param("start") LocalDateTime start,
                                            @Param("end") LocalDateTime end);
+
+    // 관리자 삭제(비활성화) 시, 완료/실패(종결) 상태가 아닌 주문만 담당자를 미배정으로 되돌린다.
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Orders o SET o.admin = NULL WHERE o.admin.adminId = :adminId AND o.state.stateId NOT IN :terminalStateIds")
+    int unassignNonTerminalOrdersForAdmin(@Param("adminId") int adminId,
+                                          @Param("terminalStateIds") List<Integer> terminalStateIds);
 }

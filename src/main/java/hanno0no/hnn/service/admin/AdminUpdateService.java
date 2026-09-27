@@ -50,6 +50,10 @@ public class AdminUpdateService {
         AdminUser newManager = adminUserRepository.findByUserName(newManagerName)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다: " + newManagerName));
 
+        if (newManager.getDeletedAt() != null) {
+            throw new IllegalArgumentException("삭제된 관리자에게는 담당자를 배정할 수 없습니다: " + newManagerName);
+        }
+
         order.setAdmin(newManager);
         sseEventService.emit(SseEventService.ORDERS_UPDATED);
     }

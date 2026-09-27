@@ -95,6 +95,12 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/admins/{id}/reactivate")
+    public ResponseEntity<Void> reactivateAdmin(@PathVariable Integer id) {
+        adminManagementService.reactivateAdmin(id);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getStats() {
         return ResponseEntity.ok(adminStatsService.getStats());

@@ -109,6 +109,7 @@ public class RegisterService {
         List<String> adminNames = new ArrayList<>();
         List<AdminUser> adminUsers = adminUserRepository.findAll();
         for (AdminUser adminUser : adminUsers) {
+            if (adminUser.getDeletedAt() != null) continue; // 삭제(비활성화)된 관리자는 제외
             adminNames.add(adminUser.getUsername());
         }
 

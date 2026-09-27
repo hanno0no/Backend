@@ -24,6 +24,10 @@ public class AdminSetupPasswordService {
         AdminUser adminUser = adminUserRepository.findByUserName(request.getUserName())
                 .orElseThrow(() -> new UnauthorizedException("아이디 또는 비밀번호가 일치하지 않습니다."));
 
+        if (adminUser.getDeletedAt() != null) {
+            throw new UnauthorizedException("아이디 또는 비밀번호가 일치하지 않습니다.");
+        }
+
         if (adminUser.getPassword_hash() != null) {
             throw new IllegalStateException("이미 비밀번호가 설정된 계정입니다.");
         }
@@ -32,6 +36,6 @@ public class AdminSetupPasswordService {
         }
 
         adminUser.setPassword_hash(passwordEncoder.encode(request.getNewPassword()));
-        return jwtUtil.generateToken(adminUser.getUserName());
+        return jwtUtil.generateToken(adminUser.getAdminId());
     }
 }

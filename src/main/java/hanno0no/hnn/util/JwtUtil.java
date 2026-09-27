@@ -31,11 +31,13 @@ public class JwtUtil {
 
     /**
 
-     사용자 이름을 기반으로 JWT를 생성합니다.
+     관리자 id(admin_id)를 기반으로 JWT를 생성합니다.
+     username이 아니라 불변값인 admin_id를 subject로 써야, 관리자가 본인 아이디를
+     변경해도 이미 발급된 토큰의 세션이 깨지지 않는다.
      */
-    public String generateToken(String username) {
+    public String generateToken(int adminId) {
         return Jwts.builder()
-                .setSubject(username) // 토큰의 주체(사용자 이름)
+                .setSubject(String.valueOf(adminId)) // 토큰의 주체(관리자 id)
                 .setIssuedAt(new Date(System.currentTimeMillis())) // 토큰 발급 시간
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime)) // 토큰 만료 시간
 // ✨ 5. 문자열 대신 getSigningKey() 메소드가 반환하는 Key 객체로 서명합니다.
@@ -45,10 +47,10 @@ public class JwtUtil {
 
     /**
 
-     토큰에서 사용자 이름(subject)을 추출합니다.
+     토큰에서 관리자 id(subject)를 추출합니다.
      */
-    public String getUsernameFromToken(String token) {
-        return getClaims(token).getSubject();
+    public int getAdminIdFromToken(String token) {
+        return Integer.parseInt(getClaims(token).getSubject());
     }
 
     /**
@@ -63,9 +65,9 @@ public class JwtUtil {
 
      토큰의 유효성을 검증합니다.
      */
-    public boolean validateToken(String token, String username) {
-        final String usernameFromToken = getUsernameFromToken(token);
-        return (usernameFromToken.equals(username) && !isTokenExpired(token));
+    public boolean validateToken(String token, int adminId) {
+        final int adminIdFromToken = getAdminIdFromToken(token);
+        return (adminIdFromToken == adminId && !isTokenExpired(token));
     }
 
     /**

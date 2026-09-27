@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,6 +32,9 @@ public class AdminUser implements UserDetails {
     @CollectionTable(name = "admin_work_area", joinColumns = @JoinColumn(name = "admin_id"))
     @Column(name = "work_area")
     private Set<String> workAreas = new HashSet<>();
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     public AdminUser() {}  // 기본 생성자
 
@@ -67,6 +71,13 @@ public class AdminUser implements UserDetails {
     }
     public void setWorkAreas(Set<String> workAreas) {
         this.workAreas = workAreas;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
     @Override
@@ -106,7 +117,7 @@ public class AdminUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true; // 계정이 활성화되었는가?
+        return deletedAt == null; // 소프트 삭제(비활성화)된 계정은 로그인 불가
     }
 
 }
